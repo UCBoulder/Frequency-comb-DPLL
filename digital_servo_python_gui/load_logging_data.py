@@ -24,13 +24,13 @@ N_pts_max = 1e6 # -1 means all the file
 
 ##########################
 # Start Qt:
-app = QtGui.QApplication(sys.argv)
+app = QtWidgets.QApplication(sys.argv)
 
 ##########################
 # Show a dialog to select which log to look at:
 
 print(strFolder)
-strFileName = QtGui.QFileDialog.getOpenFileName(None, 'Open file', strFolder)
+strFileName = QtWidgets.QFileDialog.getOpenFileName(None, 'Open file', strFolder)
 strFileName = str(strFileName)
 print(strFileName)
 if strFileName == '':

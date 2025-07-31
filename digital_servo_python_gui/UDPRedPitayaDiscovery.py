@@ -30,8 +30,7 @@ class UDPRedPitayaDiscovery():
         self.startListening()
         
     def __del__(self):
-        # print("UDPRedPitayaDiscovery::__del__()")
-        pass
+        print("UDPRedPitayaDiscovery::__del__()")
         
     def startListening(self):
         # Initialization:
@@ -66,6 +65,7 @@ class UDPRedPitayaDiscovery():
             mac_address_data = mac_address_data.decode('ascii') # received data is in bytes format and we handle the mac address as an ascii string internally
 
             # we don't care about the data, we are only looking for the IP addresses
+#            print("Host info: %s: " % host_info) # was trying to get device name as well...
             return (host_info[0], mac_address_data)
         else:
             return (None, None)
@@ -79,7 +79,7 @@ class UDPRedPitayaDiscovery():
         self.send_broadcast()
         
         # then we check for answers:
-        start_time = time.perf_counter()
+        start_time = time.time()
         ElapsedTime = 0
         while ElapsedTime < Timeout:
             
@@ -88,7 +88,7 @@ class UDPRedPitayaDiscovery():
             print((host, mac_address))
             
             time.sleep(0.1)
-            ElapsedTime = time.perf_counter() - start_time
+            ElapsedTime = time.time() - start_time
             
             
 def main():

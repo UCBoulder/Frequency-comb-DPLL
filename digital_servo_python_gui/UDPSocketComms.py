@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 18 13:03:46 2014
+Created on Thu Dec 17 17:54:31 2015
 
-@author: jnd
+@author: JD
 """
 from __future__ import print_function
 
+
 import socket
+
 import select
+
+
+
+return
+
 import time
 
 class AsyncSocketServer():
@@ -27,10 +34,10 @@ class AsyncSocketServer():
         print('Creating server socket...')
         HOST = ''       # means local host
 
-        self.sock_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock_server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock_server.setblocking(0)
         self.sock_server.bind((HOST, self.port_number))
-        self.sock_server.listen(5)
+        #self.sock_server.listen(5)
 
     def run(self):
         # First: check if there is any connection pending:

@@ -7,12 +7,12 @@ Created on Mon Dec 16 09:51:07 2013
 from __future__ import print_function
 
 import sys
-from PyQt5 import QtGui, Qt
+from PyQt5 import QtGui, Qt, QtWidgets
 #import numpy as np
 import visa
 import time
 
-class PythonSoup(QtGui.QDialog):
+class PythonSoup(QtWidgets.QDialog):
     
     def __init__(self, counter0_visa_address='GPIB0::9::INSTR', counter1_visa_address='GPIB0::3::INSTR'):
         super(PythonSoup, self).__init__()
@@ -246,14 +246,14 @@ class PythonSoup(QtGui.QDialog):
             print(freq)
 #        counter = self.counters[0]
 #        freq = float(counter.ask(':FETCH:FREQUENCY?'))
-#        time_after = time.perf_counter()
+#        time_after = time.time()
 #        print('Time after: %f sec' % (time_after-time_before))
 #        print(freq)
 #        frequencies.append(freq)
 #        
 #        counter = self.counters[1]
 #        freq = float(counter.ask(':FETCH:FREQUENCY?'))
-#        time_after = time.perf_counter()
+#        time_after = time.time()
 #        print('Time after: %f sec' % (time_after-time_before))
 #        print(freq)
 #        
@@ -352,7 +352,7 @@ def main():
     
     
     # Start Qt:
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     
     # Blue counter GPIB address = 3, Orange counter GPIB address = 9
     # FOrmat is "GPIBX::Y::INSTR", where X is the GPIB interface number (usually 0)
