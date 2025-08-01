@@ -6,7 +6,7 @@ by JD Deschenes, October 2013
 from __future__ import print_function
 
 import time
-from PyQt5 import QtGui, Qt, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 import numpy as np
 
 import weakref
@@ -198,25 +198,25 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
         # Settings
         ######################################################################
 
-        self.qgroupbox_dither = Qt.QGroupBox('Dither DAC%d settings' % self.output_number)
+        self.qgroupbox_dither = QtWidgets.QGroupBox('Dither DAC%d settings' % self.output_number)
         self.qgroupbox_dither.setAutoFillBackground(True)
 
 
         # Modulation frequency:
-        self.qedit_freq_label = Qt.QLabel('Frequency [Hz]:')
-        self.qedit_dither_freq = Qt.QLineEdit(str(modulation_frequency_in_hz))
+        self.qedit_freq_label = QtWidgets.QLabel('Frequency [Hz]:')
+        self.qedit_dither_freq = QtWidgets.QLineEdit(str(modulation_frequency_in_hz))
         self.qedit_dither_freq.textChanged.connect(self.ditherClicked)
         self.qedit_dither_freq.setMaximumWidth(60)
 
         # Integration time:
-        self.qedit_int_label = Qt.QLabel('Integration time [s]:')
-        self.qedit_integration_time = Qt.QLineEdit(str(integration_time_in_seconds))
+        self.qedit_int_label = QtWidgets.QLabel('Integration time [s]:')
+        self.qedit_integration_time = QtWidgets.QLineEdit(str(integration_time_in_seconds))
         self.qedit_integration_time.textChanged.connect(self.ditherClicked)
         self.qedit_integration_time.setMaximumWidth(60)
 
         # Amplitude:
-        self.qlabel_dither_amplitude = Qt.QLabel('Amplitude [0-1]:')
-        self.qedit_dither_amplitude = Qt.QLineEdit(str(output_amplitude))
+        self.qlabel_dither_amplitude = QtWidgets.QLabel('Amplitude [0-1]:')
+        self.qedit_dither_amplitude = QtWidgets.QLineEdit(str(output_amplitude))
         self.qedit_dither_amplitude.textChanged.connect(self.ditherClicked)
         self.qedit_dither_amplitude.setMaximumWidth(60)
 
@@ -231,7 +231,7 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
         self.qchk_mode_auto = QtWidgets.QRadioButton('Automatic')
         self.qchk_mode_manual_off = QtWidgets.QRadioButton('Manual Off')
         self.qchk_mode_manual_on = QtWidgets.QRadioButton('Manual On')
-        qbtn_group = Qt.QButtonGroup()
+        qbtn_group = QtWidgets.QButtonGroup()
         qbtn_group.addButton(self.qchk_mode_auto)
         qbtn_group.addButton(self.qchk_mode_manual_off)
         qbtn_group.addButton(self.qchk_mode_manual_on)
@@ -256,7 +256,7 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
         grid.addWidget(self.qchk_mode_manual_on,            5, 0, 1, 2)
         self.qgroupbox_dither.setLayout(grid)
 
-        vbox = Qt.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addWidget(self.qgroupbox_dither)
         self.setLayout(vbox)
 

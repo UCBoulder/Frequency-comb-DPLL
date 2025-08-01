@@ -6,7 +6,7 @@ by JD Deschenes, October 2013
 from __future__ import print_function
 
 import time
-from PyQt5 import QtGui, Qt, QtWidgets
+from PyQt5 import QtGui, QtWidgets, QtCore
 #import PyQt5.Qwt5 as Qwt
 import numpy as np
 
@@ -326,53 +326,53 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         # Create the widgets which control the system identification module:
 
         # Input select
-        transfer_input_label = Qt.QLabel('Input:')
-        self.qcombo_transfer_input = Qt.QComboBox()
+        transfer_input_label = QtWidgets.QLabel('Input:')
+        self.qcombo_transfer_input = QtWidgets.QComboBox()
         self.qcombo_transfer_input.addItems(['ADC 0', 'ADC 1', 'DDC 0', 'DDC 1'])
         self.qcombo_transfer_input.setCurrentIndex(2)
 #        transfer_input_label.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
 #        self.qcombo_transfer_input.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
 
         # Output select
-        transfer_output_label = Qt.QLabel('Output:')
-        self.qcombo_transfer_output = Qt.QComboBox()
+        transfer_output_label = QtWidgets.QLabel('Output:')
+        self.qcombo_transfer_output = QtWidgets.QComboBox()
         self.qcombo_transfer_output.addItems(['DAC 0', 'DAC 1', 'DAC 2'])
         self.qcombo_transfer_output.setCurrentIndex(0)
 #        transfer_output_label.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
 #        self.qcombo_transfer_output.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
 
         #
-        settling_time_label = Qt.QLabel('System settling time [s]:')
-        self.qedit_settling_time = Qt.QLineEdit('1e-3')
+        settling_time_label = QtWidgets.QLabel('System settling time [s]:')
+        self.qedit_settling_time = QtWidgets.QLineEdit('1e-3')
         self.qedit_settling_time.setMaximumWidth(60)
         self.qedit_settling_time.editingFinished.connect(self.updateIntegrationTime)
 
 #        settling_time_label.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
 #        self.qedit_settling_time.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
 
-        freq_start_label = Qt.QLabel('Freq start [Hz]:')
-        self.qedit_freq_start = Qt.QLineEdit('10e3')
+        freq_start_label = QtWidgets.QLabel('Freq start [Hz]:')
+        self.qedit_freq_start = QtWidgets.QLineEdit('10e3')
         self.qedit_freq_start.setMaximumWidth(60)
         self.qedit_freq_start.editingFinished.connect(self.updateIntegrationTime)
 #        freq_start_label.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
 #        self.qedit_freq_start.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
 
-        freq_end_label = Qt.QLabel('Freq end [Hz]:')
-        self.qedit_freq_end = Qt.QLineEdit('2e6')
+        freq_end_label = QtWidgets.QLabel('Freq end [Hz]:')
+        self.qedit_freq_end = QtWidgets.QLineEdit('2e6')
         self.qedit_freq_end.setMaximumWidth(60)
 #        self.qedit_freq_end.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
 
-        freq_number_label = Qt.QLabel('Number of freq [max 3276]:')
-        self.qedit_freq_number = Qt.QLineEdit('160')
+        freq_number_label = QtWidgets.QLabel('Number of freq [max 3276]:')
+        self.qedit_freq_number = QtWidgets.QLineEdit('160')
         self.qedit_freq_number.setMaximumWidth(60)
 #        self.qedit_freq_number.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
 
-        amplitude_label = Qt.QLabel('Modulation amplitude [0-1]:')
-        self.qedit_output_amplitude = Qt.QLineEdit('0.01')
+        amplitude_label = QtWidgets.QLabel('Modulation amplitude [0-1]:')
+        self.qedit_output_amplitude = QtWidgets.QLineEdit('0.01')
         self.qedit_output_amplitude.setMaximumWidth(60)
 #        self.qedit_output_amplitude.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
 
-        self.qlbl_integration_time = Qt.QLabel('Integration time per freq [s]: ')
+        self.qlbl_integration_time = QtWidgets.QLabel('Integration time per freq [s]: ')
         self.updateIntegrationTime()
 
         # Button which triggers the system identification
@@ -385,7 +385,7 @@ class DisplayVNAWindow(QtWidgets.QWidget):
 
 
         # Progress bar which indicates the progression of the identification
-        self.qprogress_ident = Qt.QProgressBar()
+        self.qprogress_ident = QtWidgets.QProgressBar()
         self.qprogress_ident.setTextVisible(False)
         self.qprogress_ident.setValue(0)
 #        self.qprogress_ident.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
@@ -395,31 +395,31 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         ######################################################################
         # Settings
         ######################################################################
-        self.qgroupbox_dither = Qt.QGroupBox('Continuous output', self)
+        self.qgroupbox_dither = QtWidgets.QGroupBox('Continuous output', self)
 
 
-        self.dither_output_label = Qt.QLabel('Output:')
-        self.qcombo_dither_output = Qt.QComboBox()
+        self.dither_output_label = QtWidgets.QLabel('Output:')
+        self.qcombo_dither_output = QtWidgets.QComboBox()
         self.qcombo_dither_output.addItems(['DAC 0', 'DAC 1', 'DAC 2'])
         self.qcombo_dither_output.setCurrentIndex(0)
         self.qcombo_dither_output.currentIndexChanged.connect(self.ditherClicked)
 
         # Modulation frequency:
-        self.qedit_freq_label = Qt.QLabel('Frequency [Hz]:')
-        self.qedit_dither_freq = Qt.QLineEdit('1e6')
+        self.qedit_freq_label = QtWidgets.QLabel('Frequency [Hz]:')
+        self.qedit_dither_freq = QtWidgets.QLineEdit('1e6')
         self.qedit_dither_freq.textChanged.connect(self.ditherClicked)
         self.qedit_dither_freq.setMaximumWidth(60)
 
         # Amplitude:
-        self.qlabel_dither_amplitude = Qt.QLabel('Amplitude [0-1]:')
-        self.qedit_dither_amplitude = Qt.QLineEdit('0.01')
+        self.qlabel_dither_amplitude = QtWidgets.QLabel('Amplitude [0-1]:')
+        self.qedit_dither_amplitude = QtWidgets.QLineEdit('0.01')
         self.qedit_dither_amplitude.textChanged.connect(self.ditherClicked)
         self.qedit_dither_amplitude.setMaximumWidth(60)
 
         # Sine/Square wave
-        self.qradio_sinewave = Qt.QRadioButton('Sine wave')
-        self.qradio_squarewave = Qt.QRadioButton('Square wave')
-        self.qsign_group = Qt.QButtonGroup(self)
+        self.qradio_sinewave = QtWidgets.QRadioButton('Sine wave')
+        self.qradio_squarewave = QtWidgets.QRadioButton('Square wave')
+        self.qsign_group = QtWidgets.QButtonGroup(self)
         self.qsign_group.addButton(self.qradio_sinewave)
         self.qsign_group.addButton(self.qradio_squarewave)
 
@@ -475,10 +475,10 @@ class DisplayVNAWindow(QtWidgets.QWidget):
 
         grid.addWidget(self.qprogress_ident, 10, 0, 1, 2)
 
-        self.qgroupbox_vna = Qt.QGroupBox('Swept sine', self)
+        self.qgroupbox_vna = QtWidgets.QGroupBox('Swept sine', self)
         self.qgroupbox_vna.setLayout(grid)
 
-        vbox = Qt.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addWidget(self.qgroupbox_vna)
         vbox.addWidget(self.qgroupbox_dither)
         vbox.addItem(spacerItem)
@@ -500,7 +500,7 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
 #        self.move(qr.topLeft())
-        self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(50, 50))
+        self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + QtCore.QPoint(50, 50))
 
 
 

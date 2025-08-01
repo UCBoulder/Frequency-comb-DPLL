@@ -5,7 +5,8 @@ by JD Deschenes, October 2013
 """
 from __future__ import print_function
 import time
-from PyQt5 import QtGui, Qt, QtWidgets
+from PyQt5 import QtGui, QtWidgets, QtCore
+from PyQt5.QtCore import Qt
 #import PyQt5.Qwt5 as Qwt
 import numpy as np
 import math
@@ -194,7 +195,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         self.getVCOGain()
         self.setLock()
 
-        self.timerIDDither = Qt.QTimer(self)
+        self.timerIDDither = QtCore.QTimer(self)
         self.timerIDDither.timeout.connect(self.timerDitherEvent)
         self.startTimers()
         self.displayDAC()   # This populates the current DAC values with the actual value
@@ -260,7 +261,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         if self.output_controls[0] == True:
             self.setPWM0_event()
 
-        self.timerIDDither = Qt.QTimer(self)
+        self.timerIDDither = QtCore.QTimer(self)
         self.timerIDDither.timeout.connect(self.timerDitherEvent)
         self.startTimers()
 
@@ -434,7 +435,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
             large_step = self.sl.dev.DAC_INT_HR/(10)
 
         self.q_dac_offset[k].setSingleStep(small_step)
-        self.q_dac_offset[k].setPageStep(large_step)
+        self.q_dac_offset[k].setPageStep(int(large_step))
     ##
     ## HB, 4/27/2015, Added PWM support on DOUT0
     ##
@@ -507,7 +508,9 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
     def exportData(self):
         # First need to create a unique file name template (with good probability)
         # We simply use the system date and time, and hope that this function doesn't get called twice in a second
-        strNameTemplate = time.strftime("data_export\%m_%d_%Y_%H_%M_%S_")
+        strNameTemplate = os.path.join("data_export", time.strftime("%m_%d_%Y_%H_%M_%S_"))
+# OR, preferred for portability:
+
 #        Data to write:
 #        self.inst_freq
 #        self.freq_noise_psd
@@ -639,7 +642,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         start_time = time.time()
 
         # Write the data to disk:
-        strNameTemplate = time.strftime("data_export\%m_%d_%Y_%H_%M_%S_")
+        strNameTemplate = os.path.join("data_export", time.strftime(r"%m_%d_%Y_%H_%M_%S_"))
 
         os.makedirs('data_export', exist_ok=True)
         # Open files for output, write raw data
@@ -801,7 +804,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
                 # Convert the DAC DC offset to the slider units:
                 current_dac_offset_in_slider_units = current_dac_offset_in_counts # same as slider units
 
-                self.q_dac_offset[kDAC].setValue(current_dac_offset_in_slider_units)
+                self.q_dac_offset[kDAC].setValue(int(current_dac_offset_in_slider_units))
                 #self.setDACOffset_event()
 
 #                # Set up a ramp with 20 steps:
@@ -843,29 +846,29 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
     def initUI(self):
 #        second_half_offset = 50
         # Change the background color of the main form so that each controls group stand out better
-        PalNormal = Qt.QPalette()
+        PalNormal = QtGui.QPalette()
 
         # Assign the palette to the main form to read off the 'normal' background color:
         self.setPalette(PalNormal)
-        normalBackgroundRGB = PalNormal.color(Qt.QPalette.Background).getRgb()
+        normalBackgroundRGB = PalNormal.color(QtGui.QPalette.Background).getRgb()
 #        print(normalBackground.getRgb())
 
         # Darken the background of the dialog slightly
         darker_factor = 0.5
-        PalDarkerBackground = Qt.QPalette()
-        PalDarkerBackground.setColor(Qt.QPalette.Background, Qt.QColor(normalBackgroundRGB[0]*darker_factor, normalBackgroundRGB[1]*darker_factor, normalBackgroundRGB[2]*darker_factor))
+        PalDarkerBackground = QtGui.QPalette()
+        PalDarkerBackground.setColor(QtGui.QPalette.Background, QtGui.QColor(int(normalBackgroundRGB[0]*darker_factor), int(normalBackgroundRGB[1]*darker_factor), int(normalBackgroundRGB[2]*darker_factor)))
 #        PalDarkerBackground.setColor(Qt.QPalette.Background, Qt.QColor(255, 255, 255))
         self.setPalette(PalDarkerBackground)
         self.setAutoFillBackground(True)
 
 
         # PalNormal's color has been changed when we assigned PalDarkerBackground to self - this statement seems very circular but somehow it works
-        PalNormal.setColor(Qt.QPalette.Background, PalNormal.color(Qt.QPalette.Background))
+        PalNormal.setColor(QtGui.QPalette.Background, PalNormal.color(QtGui.QPalette.Background))
 
         ######################################################################
         # Settings
         ######################################################################
-        self.qgroupbox_settings = Qt.QGroupBox('Settings', self)
+        self.qgroupbox_settings = QtWidgets.QGroupBox('Settings', self)
 
         # Button which exports the data to the disk
         self.qbtn = QtWidgets.QPushButton('Export PSD data')
@@ -885,22 +888,22 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         self.qlabel_detected_vco_gain = {}
         if self.selected_ADC == 0:
             # CEO Lock: only one output (DAC0)
-            self.qlabel_vco_gain = Qt.QLabel('VCO Gain (DAC0) [Hz/V]:')
-            self.qlabel_detected_vco_gain_label = Qt.QLabel('Detected VCO Gain [Hz/V]:')
+            self.qlabel_vco_gain = QtWidgets.QLabel('VCO Gain (DAC0) [Hz/V]:')
+            self.qlabel_detected_vco_gain_label = QtWidgets.QLabel('Detected VCO Gain [Hz/V]:')
 
             self.qedit_vco_gain[0] = user_friendly_QLineEdit('1e6')
             self.qedit_vco_gain[0].returnPressed.connect(self.setVCOGain_event)
             self.qedit_vco_gain[0].setMaximumWidth(60)
 
-            self.qlabel_detected_vco_gain[0] = Qt.QLabel('0 Hz/V')
-            self.qlabel_detected_vco_gain[0].setAlignment(Qt.Qt.AlignHCenter)
+            self.qlabel_detected_vco_gain[0] = QtWidgets.QLabel('0 Hz/V')
+            self.qlabel_detected_vco_gain[0].setAlignment(Qt.AlignHCenter)
 
         else:
             # Optical lock
             # self.qlabel_vco_gain = Qt.QLabel('VCO Gains (DAC1, DAC2HV) [Hz/V]:')
-            self.qlabel_vco_gain = Qt.QLabel('VCO Gain (DAC1) [Hz/V]:')
+            self.qlabel_vco_gain = QtWidgets.QLabel('VCO Gain (DAC1) [Hz/V]:')
 
-            self.qlabel_detected_vco_gain_label = Qt.QLabel('Detected VCO Gain [Hz/V]:')
+            self.qlabel_detected_vco_gain_label = QtWidgets.QLabel('Detected VCO Gain [Hz/V]:')
 
             self.qedit_vco_gain[1] = user_friendly_QLineEdit('1e6')
             self.qedit_vco_gain[1].returnPressed.connect(self.setVCOGain_event)
@@ -910,22 +913,22 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
             # self.qedit_vco_gain[2].returnPressed.connect(self.setVCOGain_event)
             # self.qedit_vco_gain[2].setMaximumWidth(60)
 
-            self.qlabel_detected_vco_gain[1] = Qt.QLabel('0 Hz/V')
-            self.qlabel_detected_vco_gain[1].setAlignment(Qt.Qt.AlignHCenter)
+            self.qlabel_detected_vco_gain[1] = QtWidgets.QLabel('0 Hz/V')
+            self.qlabel_detected_vco_gain[1].setAlignment(Qt.AlignHCenter)
 
             # self.qlabel_detected_vco_gain[2] = Qt.QLabel('0 Hz/V')
             # self.qlabel_detected_vco_gain[2].setAlignment(Qt.Qt.AlignHCenter)
 
 
         # DDC reference frequency:
-        self.qlabel_ref_freq = Qt.QLabel('Reference freq [Hz]:')
+        self.qlabel_ref_freq = QtWidgets.QLabel('Reference freq [Hz]:')
         self.qedit_ref_freq = user_friendly_QLineEdit('5e6')
         self.qedit_ref_freq.returnPressed.connect(self.setVCOFreq_event)
         self.qedit_ref_freq.setMaximumWidth(60)
 
 
         # Main button for turning the locks on/off:
-        self.qchk_lock = Qt.QCheckBox('Lock')
+        self.qchk_lock = QtWidgets.QCheckBox('Lock')
         self.qchk_lock.setStyleSheet('')
         self.qchk_lock.setStyleSheet('font-size: 18pt; color: white; background-color: red')
 #        self.qchk_lock.setStyleSheet('font-size: 18pt; color: white; background-color: green')
@@ -934,13 +937,13 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 
 
         # Button which opens the dither controls:
-        self.qbutton_dither_controls = Qt.QPushButton('')
+        self.qbutton_dither_controls = QtWidgets.QPushButton('')
         self.qbutton_dither_controls.clicked.connect(self.openDitherControls)
 
         # VCO sign:
-        self.qsign_positive = Qt.QRadioButton('VCO sign +')
-        self.qsign_negative = Qt.QRadioButton('VCO sign -')
-        self.qsign_group = Qt.QButtonGroup(self)
+        self.qsign_positive = QtWidgets.QRadioButton('VCO sign +')
+        self.qsign_negative = QtWidgets.QRadioButton('VCO sign -')
+        self.qsign_group = QtWidgets.QButtonGroup(self)
         self.qsign_group.addButton(self.qsign_positive)
         self.qsign_group.addButton(self.qsign_negative)
 
@@ -952,12 +955,12 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 
         # Create widgets to indicate performance
         self.last_refresh = time.time()
-        self.qlabel_refreshrate_display = Qt.QLabel('Actual delay:')
-        self.qlabel_refreshrate = Qt.QLabel('1000 ms')
+        self.qlabel_refreshrate_display = QtWidgets.QLabel('Actual delay:')
+        self.qlabel_refreshrate = QtWidgets.QLabel('1000 ms')
 #        self.qlabel_refreshrate.resize(self.qlabel_refreshrate.sizeHint())
 
 
-        self.qlabel_timerdelay = Qt.QLabel('Refresh delay [ms]:')
+        self.qlabel_timerdelay = QtWidgets.QLabel('Refresh delay [ms]:')
         self.qedit_timerdelay = user_friendly_QLineEdit('200')
         self.qedit_timerdelay.returnPressed.connect(self.refreshChk_event)
         self.qedit_timerdelay.setMaximumWidth(60)
@@ -983,10 +986,10 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 
         # Status reporting:
         if self.selected_ADC == 0:
-            self.qlbl_status1 = Qt.QLabel('Status: Idle')
+            self.qlbl_status1 = QtWidgets.QLabel('Status: Idle')
         elif self.selected_ADC == 1:
-            self.qlbl_status1 = Qt.QLabel('Status: Idle')
-            self.qlbl_status2 = Qt.QLabel('Status: Idle')
+            self.qlbl_status1 = QtWidgets.QLabel('Status: Idle')
+            self.qlbl_status2 = QtWidgets.QLabel('Status: Idle')
 
 #        self.qbtn_reset = QtWidgets.QPushButton('Reset frontend')
 #        self.qbtn_reset.clicked.connect(self.reset_front_end)
@@ -1036,7 +1039,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 
         # We put a sub-grid in the grid
         # we put the VCO controls in the sub-grid, this way the outer grid stays the same size regardless of the number of elements
-        grid2 = Qt.QGridLayout()
+        grid2 = QtWidgets.QGridLayout()
         grid2.setHorizontalSpacing(15)
         grid2.setVerticalSpacing(10)
 
@@ -1086,7 +1089,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 #             grid.addWidget(self.qlbl_status2,           2, 6, 1, 1)
 
 #        grid.addWidget(self.qbtn_reset,                 1, 7)
-        grid.addWidget(Qt.QLabel(),                     0, 9, 1, 1)
+        grid.addWidget(QtWidgets.QLabel(),                     0, 9, 1, 1)
         grid.setColumnStretch(9, 1)
 
         self.qgroupbox_settings.setLayout(grid)
@@ -1097,44 +1100,44 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         ######################################################################
         # Spectrum analyzer/Diagnostics
         ######################################################################
-        self.qgroupbox_diagnostics = Qt.QGroupBox('Spectrum analyzer/diagnostics (all computed from raw ADC input)', self)
+        self.qgroupbox_diagnostics = QtWidgets.QGroupBox('Spectrum analyzer/diagnostics (all computed from raw ADC input)', self)
 
         # Create the scale which indicates the ADC fill ratio:
-        self.qlabel_adc_fill = Qt.QLabel('ADC fill\n[bits]')
-        self.qlabel_adc_fill.setAlignment(Qt.Qt.AlignHCenter)
+        self.qlabel_adc_fill = QtWidgets.QLabel('ADC fill\n[bits]')
+        self.qlabel_adc_fill.setAlignment(Qt.AlignHCenter)
 
         self.qadc0_scale = ThermometerWidget()#Qwt.QwtThermo()
         #self.qadc0_scale.setOrientation(Qt.Qt.Vertical, Qwt.QwtThermo.LeftScale)
         self.qadc0_scale.setRange(0, 16)
         #self.qadc0_scale.setScale(0, 16)
         self.qadc0_scale.setValue(0)
-        self.qadc0_scale.setFillColor(Qt.Qt.blue)
+        self.qadc0_scale.setFillColor(Qt.blue)
         ticksListMajor = [0, 5, 10, 15]
         ticksListMinor = [2.5, 7.5, 12.5]
         ticksLabelMajor = list(map(str, ticksListMajor))
         self.qadc0_scale.setTicks(ticksListMajor, ticksListMinor, ticksLabelMajor)
 
-        self.qlabel_adc_fill_value = Qt.QLabel('10 bits')
-        self.qlabel_adc_fill_value.setAlignment(Qt.Qt.AlignHCenter)
+        self.qlabel_adc_fill_value = QtWidgets.QLabel('10 bits')
+        self.qlabel_adc_fill_value.setAlignment(Qt.AlignHCenter)
 
         # Create the scale which indicates the baseband SNR:
-        self.qlabel_baseband_snr = Qt.QLabel('SNR\n[dB]')
-        self.qlabel_baseband_snr.setAlignment(Qt.Qt.AlignHCenter)
+        self.qlabel_baseband_snr = QtWidgets.QLabel('SNR\n[dB]')
+        self.qlabel_baseband_snr.setAlignment(Qt.AlignHCenter)
 
         self.qthermo_baseband_snr = ThermometerWidget()#Qwt.QwtThermo()
         #self.qthermo_baseband_snr.setOrientation(Qt.Qt.Vertical, Qwt.QwtThermo.LeftScale)
         self.qthermo_baseband_snr.setRange(0, 50)
         self.qthermo_baseband_snr.setScale(0, 50)
         self.qthermo_baseband_snr.setValue(0)
-        self.qthermo_baseband_snr.setFillColor(Qt.Qt.blue)
+        self.qthermo_baseband_snr.setFillColor(Qt.blue)
         ticksListMajor = [0, 10, 20, 30, 40, 50]
         ticksListMinor = [5, 15, 25, 35, 45]
         ticksLabelMajor = list(map(str, ticksListMajor))
         self.qthermo_baseband_snr.setTicks(ticksListMajor, ticksListMinor, ticksLabelMajor)
 
 
-        self.qlabel_baseband_snr_value = Qt.QLabel('20 dB')
-        self.qlabel_baseband_snr_value.setAlignment(Qt.Qt.AlignHCenter)
+        self.qlabel_baseband_snr_value = QtWidgets.QLabel('20 dB')
+        self.qlabel_baseband_snr_value.setAlignment(Qt.AlignHCenter)
 
        # # Create the scale which indicates the average frequency error:
        # self.qlabel_ddc0_error = Qt.QLabel('Freq error\n[MHz]')
@@ -1161,23 +1164,23 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         self.qchk_dac_limited = {}
 
         if self.output_controls[0] == True:
-            self.qlabel_pwm0 = Qt.QLabel('Output\nPWM 0 [V]')
-            self.qlabel_pwm0.setAlignment(Qt.Qt.AlignHCenter)
+            self.qlabel_pwm0 = QtWidgets.QLabel('Output\nPWM 0 [V]')
+            self.qlabel_pwm0.setAlignment(Qt.AlignHCenter)
 
-            self.q_pwm0_value = Qt.QSlider()
+            self.q_pwm0_value = QtWidgets.QSlider()
             self.q_pwm0_value.valueChanged.connect(self.setPWM0_event)
-            self.q_pwm0_value.setOrientation(Qt.Qt.Vertical)
+            self.q_pwm0_value.setOrientation(Qt.Vertical)
             self.q_pwm0_value.setMinimum(0)
-            self.q_pwm0_value.setMaximum(1e6)
+            self.q_pwm0_value.setMaximum(int(1e6))
             self.q_pwm0_value.setSliderPosition(0)
 
-            self.qlabel_pwm0_value = Qt.QLabel('Value\nPWM 0 [V]')
-            self.qlabel_pwm0_value.setAlignment(Qt.Qt.AlignHCenter)
+            self.qlabel_pwm0_value = QtWidgets.QLabel('Value\nPWM 0 [V]')
+            self.qlabel_pwm0_value.setAlignment(Qt.AlignHCenter)
 
         for k in range(3):
             if self.output_controls[k] == True:
-                self.qlabel_dac_current[k] = Qt.QLabel('Output\nDAC %d [V]' % k)
-                self.qlabel_dac_current[k].setAlignment(Qt.Qt.AlignHCenter)
+                self.qlabel_dac_current[k] = QtWidgets.QLabel('Output\nDAC %d [V]' % k)
+                self.qlabel_dac_current[k].setAlignment(Qt.AlignHCenter)
 
                 self.qthermo_dac_current[k] = ThermometerWidget()#Qwt.QwtThermo()
                 #self.qthermo_dac_current[k].setOrientation(Qt.Qt.Vertical, Qwt.QwtThermo.LeftScale)
@@ -1185,31 +1188,31 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
                 self.qthermo_dac_current[k].setScale(self.sl.dev.DAC_V_INT * self.sl.DACs_limit_low[k], self.sl.dev.DAC_V_INT * self.sl.DACs_limit_high[k])
                 self.qthermo_dac_current[k].setValue(0)
                 #self.qthermo_dac_current[k].setFillBrush(Qt.QBrush(Qt.QColor(0, 186, 52)))
-                self.qthermo_dac_current[k].setFillColor(Qt.QColor(0, 186, 52))
+                self.qthermo_dac_current[k].setFillColor(QtGui.QColor(0, 186, 52))
                 ticksListMajor = [-1, -0.5, 0, 0.5, 1]
                 ticksListMinor = [-0.75, -0.25, 0.25, 0.75]
                 ticksLabelMajor = list(map(str, ticksListMajor))
                 self.qthermo_dac_current[k].setTicks(ticksListMajor, ticksListMinor, ticksLabelMajor)
 
 
-                self.qlabel_dac_offset[k] = Qt.QLabel('Offset\nDAC %d [V]' % k)
-                self.qlabel_dac_offset[k].setAlignment(Qt.Qt.AlignHCenter)
+                self.qlabel_dac_offset[k] = QtWidgets.QLabel('Offset\nDAC %d [V]' % k)
+                self.qlabel_dac_offset[k].setAlignment(Qt.AlignHCenter)
 
-                self.q_dac_offset[k] = Qt.QSlider()
+                self.q_dac_offset[k] = QtWidgets.QSlider()
                 self.q_dac_offset[k].valueChanged.connect(self.setDACOffset_event)
                 self.q_dac_offset[k].setSliderPosition(0)
-                self.q_dac_offset[k].setOrientation(Qt.Qt.Vertical)
+                self.q_dac_offset[k].setOrientation(Qt.Vertical)
 
                 # Units are the same as the full integer range of DAC values
                 self.q_dac_offset[k].setMinimum(-self.sl.dev.DAC_INT_HR)
                 self.q_dac_offset[k].setMaximum(self.sl.dev.DAC_INT_HR)
 
-                self.qedit_dac_offset[k] = Qt.QLineEdit('') #JShaw
+                self.qedit_dac_offset[k] = QtWidgets.QLineEdit('') #JShaw
                 self.qedit_dac_offset[k].setMaximumWidth(60)
                 self.qedit_dac_offset[k].returnPressed.connect(self.updateDACOffset_event)
 
 				# Limit DAC boxes. Check existing DAC limit during initialization # Doesn't work order-wise
-                self.qchk_dac_limited[k] = Qt.QCheckBox('Limit DAC')
+                self.qchk_dac_limited[k] = QtWidgets.QCheckBox('Limit DAC')
 #                print('DAC %d lower limit %d' % (k, self.sl.DACs_limit_low[k])) # Useless because not yet connected to RP
 #                if int(self.sl.DACs_limit_low[k]) == 0: # is this a safe comparator type-wise?
 #                    self.qchk_dac_limited[k].setChecked(True)
@@ -1218,29 +1221,29 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 #                    self.qchk_dac_limited[k].setChecked(False)
                 self.qchk_dac_limited[k].clicked.connect(self.updateDAClimit_event)
 
-                self.qlabel_dac_current_value[k] = Qt.QLabel('0 V')
-                self.qlabel_dac_current_value[k].setAlignment(Qt.Qt.AlignHCenter)
+                self.qlabel_dac_current_value[k] = QtWidgets.QLabel('0 V')
+                self.qlabel_dac_current_value[k].setAlignment(Qt.AlignHCenter)
 
-                self.qlabel_dac_offset_value[k] = Qt.QLabel('0 V')
-                self.qlabel_dac_offset_value[k].setAlignment(Qt.Qt.AlignHCenter)
+                self.qlabel_dac_offset_value[k] = QtWidgets.QLabel('0 V')
+                self.qlabel_dac_offset_value[k].setAlignment(Qt.AlignHCenter)
 
 
         # Create widgets to set the number of points for the graphs:
-        self.qlabel_rawdata_rbw = Qt.QLabel('RBW: 100 kHz')
-        self.qlabel_rawdata_pnts = Qt.QLabel('Points:')
-        self.qedit_rawdata_length = Qt.QLineEdit('1.73e3')
+        self.qlabel_rawdata_rbw = QtWidgets.QLabel('RBW: 100 kHz')
+        self.qlabel_rawdata_pnts = QtWidgets.QLabel('Points:')
+        self.qedit_rawdata_length = QtWidgets.QLineEdit('1.73e3')
         self.qedit_rawdata_length.setMaximumWidth(60)
 
         # Plot type select
-        self.qlabel_adc_plot_type = Qt.QLabel('Plot type:')
-        self.qcombo_adc_plottype = Qt.QComboBox()
+        self.qlabel_adc_plot_type = QtWidgets.QLabel('Plot type:')
+        self.qcombo_adc_plottype = QtWidgets.QComboBox()
         self.qcombo_adc_plottype.addItems(['Spectrum', 'Time: raw input', 'Time: Phase', 'Time: IQ', 'Time: IQ, synced'])
 
 
 
         # Input select
-        self.qlabel_adc_plot_input = Qt.QLabel('Input:')
-        self.qcombo_adc_plot = Qt.QComboBox()
+        self.qlabel_adc_plot_input = QtWidgets.QLabel('Input:')
+        self.qcombo_adc_plot = QtWidgets.QComboBox()
         self.qcombo_adc_plot.addItems(['ADC 0', 'ADC 1', 'DAC 0', 'DAC 1', 'DAC 2'])
         self.qcombo_adc_plot.setCurrentIndex(self.selected_ADC)
 
@@ -1261,7 +1264,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         self.qplt_IQ.setFixedSize(100, 100)
 #        self.qplt_IQ.setsetHeightForWidth(True)
         # qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Preferred, Qt.QSizePolicy.Preferred)
-        qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.Fixed)
+        qPolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         # qPolicy.setHeightForWidth(True)
         self.qplt_IQ.setSizePolicy(qPolicy)
 
@@ -1277,7 +1280,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         self.qplt_IQ.hideAxis('left')
         self.qplt_IQ.hideAxis('bottom')
 
-        self.lblplt_IQ_title = Qt.QLabel('Baseband IQ:')
+        self.lblplt_IQ_title = QtWidgets.QLabel('Baseband IQ:')
 
         # Create the curves in the plot
         self.curve_IQ = self.qplt_IQ.getPlotItem().plot(pen = None, symbol = 'o', symbolPen=None, symbolSize=.75, symbolBrush='b')
@@ -1346,7 +1349,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         grid.setRowStretch(1, 1)
 
         # The plots:
-        qhoriz = Qt.QHBoxLayout()
+        qhoriz = QtWidgets.QHBoxLayout()
         qhoriz.addWidget(self.lblplt_IQ_title)
         qhoriz.addWidget(self.qplt_IQ)
         qhoriz.addStretch(1)
@@ -1381,9 +1384,9 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         ######################################################################
         # Create the controls for the loop filters
         ######################################################################
-        self.qgroupbox_loop_filters = Qt.QGroupBox('Loop filters', self)
+        self.qgroupbox_loop_filters = QtWidgets.QGroupBox('Loop filters', self)
 
-        hbox = Qt.QHBoxLayout()
+        hbox = QtWidgets.QHBoxLayout()
         self.qloop_filters = {}
 
         for k in range(3):
@@ -1412,11 +1415,11 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         ######################################################################
         # Phase noise analysis
         ######################################################################
-        self.qgroupbox_phasenoise = Qt.QGroupBox('Phase noise (all computed from DDC output)', self)
+        self.qgroupbox_phasenoise = QtWidgets.QGroupBox('Phase noise (all computed from DDC output)', self)
 
         # Selector for the plot type (phase or freq noise)
 #        self.qlabel_ddc_plot_select = Qt.QLabel('Plot type:')
-        self.qcombo_ddc_plot = Qt.QComboBox()
+        self.qcombo_ddc_plot = QtWidgets.QComboBox()
         self.qcombo_ddc_plot.addItem('Freq')
         self.qcombo_ddc_plot.addItem('Phase')
         self.qcombo_ddc_plot.addItem('Freq: time domain')
@@ -1424,33 +1427,33 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         self.qcombo_ddc_plot.setCurrentIndex(1)
 
         # Create widgets to set the number of points for the DDC graphs:
-        self.qlabel_ddc_rbw = Qt.QLabel('RBW: 100 kHz; Points:')
-        self.qedit_ddc_length = Qt.QLineEdit('32.768e3') # this used to be 3e5 in the Dave Leibrant box version, but was changed to 16e3 due to RedPitaya memory limitations
+        self.qlabel_ddc_rbw = QtWidgets.QLabel('RBW: 100 kHz; Points:')
+        self.qedit_ddc_length = QtWidgets.QLineEdit('32.768e3') # this used to be 3e5 in the Dave Leibrant box version, but was changed to 16e3 due to RedPitaya memory limitations
         self.qedit_ddc_length.setMaximumWidth(60)
 
         # Create widgets to set the higher frequency of the integration:
-        self.qlabel_cumul_integral = Qt.QLabel('Integration\nlimit [Hz]:')
-        self.qedit_cumul_integral = Qt.QLineEdit('5e6')
+        self.qlabel_cumul_integral = QtWidgets.QLabel('Integration\nlimit [Hz]:')
+        self.qedit_cumul_integral = QtWidgets.QLineEdit('5e6')
         self.qedit_cumul_integral.setMaximumWidth(60)
 
         # Display mean frequency error:
-        self.qlbl_mean_freq_error = Qt.QLabel('Mean freq error = 0 MHz')
+        self.qlbl_mean_freq_error = QtWidgets.QLabel('Mean freq error = 0 MHz')
 
         # Checkbox to enable faster updates of the phase noise plot:
-        self.qchk_phase_noise_fast_updates = Qt.QCheckBox('Faster updates')
+        self.qchk_phase_noise_fast_updates = QtWidgets.QCheckBox('Faster updates')
         self.qchk_phase_noise_fast_updates.setChecked(False)
 
         # X and Y limits for the plot:
-        self.qlbl_xlims = Qt.QLabel('Xmin, Xmax')
-        self.qedit_xlims = Qt.QLineEdit('3e3, 5e6')
+        self.qlbl_xlims = QtWidgets.QLabel('Xmin, Xmax')
+        self.qedit_xlims = QtWidgets.QLineEdit('3e3, 5e6')
         self.qedit_xlims.setMaximumWidth(60)
-        self.qlbl_ylims = Qt.QLabel('Ymin, Ymax')
-        self.qedit_ylims = Qt.QLineEdit('-100, -30')
+        self.qlbl_ylims = QtWidgets.QLabel('Ymin, Ymax')
+        self.qedit_ylims = QtWidgets.QLineEdit('-100, -30')
         self.qedit_ylims.setMaximumWidth(60)
 
         # Averaging controls: # Averages (1=off)
-        self.qlbl_spc_averaging = Qt.QLabel('# Averages\n(1=off)')
-        self.qedit_spc_averaging = Qt.QLineEdit('1')
+        self.qlbl_spc_averaging = QtWidgets.QLabel('# Averages\n(1=off)')
+        self.qedit_spc_averaging = QtWidgets.QLineEdit('1')
         self.qedit_spc_averaging.setMaximumWidth(60)
 
         # Create the frequency domain plot for the DDC0
@@ -1512,7 +1515,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 
 
         # Put all the widgets into a grid layout
-        grid = Qt.QGridLayout()
+        grid = QtWidgets.QGridLayout()
 #        grid.addWidget(self.qlabel_ddc_plot_select, 0, 0)
         grid.addWidget(self.qcombo_ddc_plot, 0, 0, 1, 2)
         grid.addWidget(self.qlabel_ddc_rbw, 1, 0)
@@ -1533,7 +1536,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         grid.addWidget(self.qchk_phase_noise_fast_updates, 6, 0, 1, 2)
         grid.addWidget(self.qlbl_mean_freq_error, 7, 0, 1, 2)
 
-        grid.addWidget(Qt.QLabel(''), 8, 0)
+        grid.addWidget(QtWidgets.QLabel(''), 8, 0)
 
 
         grid.addWidget(self.qplt_DDC0_spc, 0, 2, 9, 1)
@@ -1548,7 +1551,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         ######################################################################
         # Layout for the whole form:
         ######################################################################
-        grid = Qt.QGridLayout()
+        grid = QtWidgets.QGridLayout()
         grid.setSpacing(10)
 
         grid.addWidget(self.qgroupbox_settings,          0, 0, 1, 0)
@@ -1682,7 +1685,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 
         # Start the timer which reads the dither:
 #        self.timerIDDither = Qt
-        self.timerIDDither = Qt.QTimer(self)
+        self.timerIDDither = QtCore.QTimer(self)
         self.timerIDDither.timeout.connect(self.timerDitherEvent)
         self.timerIDDither.start(100)   # 100 ms readout delay, increased to 1000 ms for debugging
         # print "Warning! Increased self.timerIDDither.start(100) to 3000 for debugging."
@@ -1740,7 +1743,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
     #                    print('Dither output: %d' % np.real(samples))
                         # np.mean() returns a numpy.float, but the conversions functions expect an ndarray
         #                print(type(samples))
-                        samples = np.ndarray((1,), dtype=np.float, buffer=samples)
+                        samples = np.ndarray((1,), dtype=float, buffer=samples)
         #                print(type(samples))
 
         #                rep1 = self.sl.scaleDitherResultsToHz(np.real(samples), k)
@@ -1768,7 +1771,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
     def timerEvent(self, e):
         if self.isVisible():
             # Handle the LEDs display
-            (LED_G0, LED_R0, LED_G1, LED_R1, LED_G2, LED_R2) = self.sl.readLEDs()
+            # (LED_G0, LED_R0, LED_G1, LED_R1, LED_G2, LED_R2) = self.sl.readLEDs()
             #print ('%d, %d, %d, %d, %d, %d' % (LED_G0, LED_R0, LED_G1, LED_R1, LED_G2, LED_R2))
             self.displayAnalyzer()
             self.displayDAC()
@@ -1847,9 +1850,9 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 
 
                 if k == 0 or k == 1:
-                    samples_out = samples_out.astype(dtype=np.float)
+                    samples_out = samples_out.astype(dtype=float)
                 elif k == 2:
-                    samples_out = samples_out.astype(dtype=np.float)*2**4  # The DAC is actually 20 bits, but only the 16 MSBs are sent to the DDR2 logger, which amounts to dividing the DAC counts by 2**4
+                    samples_out = samples_out.astype(dtype=float)*2**4  # The DAC is actually 20 bits, but only the 16 MSBs are sent to the DDR2 logger, which amounts to dividing the DAC counts by 2**4
 
 
                 try:
@@ -1943,7 +1946,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 #            print('window_NEB = %f Hz' % window_NEB)
 
         spc = np.fft.fft(detrend(inst_freq_decimated) * window_function, N_fft)
-        spc = np.real(spc*np.conj(spc))/(sum(window_function)**2) # Spectrum is now scaled in power (Hz^2 per bin)
+        spc = np.abs(spc)**2/(sum(window_function)**2) # Spectrum is now scaled in power (Hz^2 per bin)
         # Scale the spectrum to be a single-sided power spectral density in Hz^2/Hz:
         spc[1:last_index_shown] = 2*spc[1:last_index_shown] / window_NEB
 
@@ -2030,7 +2033,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         #
         elif self.qcombo_ddc_plot.currentIndex() == 1:
             # Compute the phase noise:
-            phase_noise = 10*np.log10(spc + 1e-20) - 20*np.log10(frequency_axis)
+            phase_noise = 10*np.log10(spc + 1e-20) - 20*np.log10(frequency_axis + 1e-20)
 
             # Comput the time-domain standard deviation:
             inst_phase = np.cumsum(inst_freq*2*np.pi/self.sl.dev.ADC_CLK_Hz)
@@ -2205,15 +2208,15 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
                 self.ref_exp0 = ref_exp0
                 self.raw_adc_samples = samples_out_raw
                 # Scale samples to Full Scale (FS)
-                samples_out = samples_out_raw.astype(dtype=np.float) / (self.sl.dev.ADC_INT_HR*2)
+                samples_out = samples_out_raw.astype(dtype=float) / (self.sl.dev.ADC_INT_HR*2)
                 # Scale samples to Volts
-                samples_out_v = samples_out_raw.astype(dtype=np.float) * self.sl.dev.ADC_V_INT
+                samples_out_v = samples_out_raw.astype(dtype=float) * self.sl.dev.ADC_V_INT
             else:
                 samples_out_raw = self.sl.read_dac_samples_from_DDR2()
                 # Scale samples to Full Scale (FS)
-                samples_out = samples_out_raw.astype(dtype=np.float) / (self.sl.dev.DAC_INT_HR*2)
+                samples_out = samples_out_raw.astype(dtype=float) / (self.sl.dev.DAC_INT_HR*2)
                 # Scale samples to Volts
-                samples_out_v = samples_out_raw.astype(dtype=np.float) * self.sl.dev.DAC_V_INT
+                samples_out_v = samples_out_raw.astype(dtype=float) * self.sl.dev.DAC_V_INT
 
             max_abs = np.max(np.abs(samples_out_raw))
 

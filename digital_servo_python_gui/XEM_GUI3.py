@@ -8,7 +8,9 @@ by JD Deschenes, October 2013
 """
 from __future__ import print_function
 import sys
-from PyQt5 import QtGui, Qt, QtCore, QtWidgets
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt
+
 import numpy as np
 
 
@@ -280,17 +282,17 @@ class controller(object):
             temp_control_port = 0
 
 
-        strNameTemplate = 'data_logging\%s' % strOfTime
+        strNameTemplate = r'data_logging\%s' % strOfTime
         # strNameTemplate = '%s_%s_' % (strNameTemplate, self.initial_config.strSelectedSerial)
 #        strNameTemplate = '%s_%s_' % (strNameTemplate, self.strSelectedSerial)
         self.strNameTemplate = strNameTemplate
         self.freq_error_window1 = FreqErrorWindowWithTempControlV2(self.sl, 'CEO beat in-loop counter', self.sp, 0, strNameTemplate, custom_style_sheet, 0, self.xem_gui_mainwindow)
         self.freq_error_window2 = FreqErrorWindowWithTempControlV2(self.sl, 'Optical beat in-loop counter', self.sp, 1, strNameTemplate, custom_style_sheet, temp_control_port, self.xem_gui_mainwindow2)
 
-        self.counters_window = Qt.QWidget()
+        self.counters_window = QtWidgets.QWidget()
         self.counters_window.setObjectName('MainWindow')
         self.counters_window.setStyleSheet(custom_style_sheet)
-        vbox = Qt.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addWidget(self.freq_error_window1)
         vbox.addWidget(self.freq_error_window2)
         self.counters_window.setLayout(vbox)
@@ -302,24 +304,24 @@ class controller(object):
         #self.counters_window.show()
 
         # Dither windows, this code could be moved to another class/file to help with clutter:
-        self.dither_widget0 = DisplayDitherSettingsWindow(self.sl, self.sp, 0, modulation_frequency_in_hz='1e3', output_amplitude='1e-3', integration_time_in_seconds='0.1', bEnableDither=True, custom_style_sheet=custom_style_sheet)
-        self.dither_widget1 = DisplayDitherSettingsWindow(self.sl, self.sp, 1, modulation_frequency_in_hz='5.1e3' , output_amplitude='1e-3', integration_time_in_seconds='0.1', bEnableDither=True, custom_style_sheet=custom_style_sheet)
+        self.dither_widget0 = DisplayDitherSettingsWindow(self.sl, self.sp, 0, modulation_frequency_in_hz=1e3, output_amplitude=1e-3, integration_time_in_seconds=0.1, bEnableDither=True, custom_style_sheet=custom_style_sheet)
+        self.dither_widget1 = DisplayDitherSettingsWindow(self.sl, self.sp, 1, modulation_frequency_in_hz=5.1e3 , output_amplitude=1e-3, integration_time_in_seconds=0.1, bEnableDither=True, custom_style_sheet=custom_style_sheet)
         #dither_widget2 = DisplayDitherSettingsWindow(self.sl, self.sp, 2, modulation_frequency_in_hz='110' , output_amplitude='1e-4', integration_time_in_seconds='0.1', bEnableDither=True, custom_style_sheet=custom_style_sheet)
 
         self.RP_Settings = ConfigRPSettingsUI(self.sl, self.sp, self, custom_style_sheet=custom_style_sheet, custom_shorthand=custom_shorthand)
 
-        self.settings_window = Qt.QWidget()
+        self.settings_window = QtWidgets.QWidget()
         self.settings_window.setObjectName('MainWindow')
         self.settings_window.setStyleSheet(custom_style_sheet)
-        vbox1 = Qt.QVBoxLayout()
+        vbox1 = QtWidgets.QVBoxLayout()
         vbox1.addWidget(self.dither_widget0)
         vbox1.addWidget(self.dither_widget1)
         #vbox1.addWidget(dither_widget2)
         vbox1.addStretch(1)
-        vbox2 = Qt.QVBoxLayout()
+        vbox2 = QtWidgets.QVBoxLayout()
         vbox2.addWidget(self.RP_Settings)
         vbox2.addWidget(self.divider_settings_window)
-        hbox = Qt.QHBoxLayout()
+        hbox = QtWidgets.QHBoxLayout()
         hbox.addLayout(vbox1)
         hbox.addLayout(vbox2)
         hbox.addStretch(1)
@@ -337,7 +339,7 @@ class controller(object):
     #
 
     #    # Regroup the two windows into a single one:
-        self.main_windows = Qt.QWidget()
+        self.main_windows = QtWidgets.QWidget()
         self.main_windows.setObjectName('MainWindow')
         self.main_windows.setStyleSheet(custom_style_sheet)
 
@@ -384,7 +386,7 @@ class controller(object):
         self.main_windows.setLayout(box)
         self.main_windows.setWindowTitle(custom_shorthand)
         #self.main_windows.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(945-300, 0))
-        self.main_windows.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(800-300, 0))
+        self.main_windows.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + QtCore.QPoint(800-300, 0))
 
         self.main_windows.show()
 

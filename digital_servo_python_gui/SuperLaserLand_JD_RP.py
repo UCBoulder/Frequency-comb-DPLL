@@ -31,7 +31,8 @@ class SuperLaserLand_JD_RP:
         self.bVerbose = False
         if self.bCommunicationLogging == True:
             os.makedirs('data_logging', exist_ok=True)
-            strNameTemplate = time.strftime("data_logging\%m_%d_%Y_%H_%M_%S_")
+            strNameTemplate = os.path.join("data_logging", time.strftime("%m_%d_%Y_%H_%M_%S_"))
+
             strCurrentName = strNameTemplate + 'SuperLaserLand_log.txt'
             self.log_file = open(strCurrentName, 'w')
 
@@ -801,10 +802,10 @@ class SuperLaserLand_JD_RP:
     #
 
     def convertPWMCountsToVolts(self, standard, levels, counts):
-        return np.float(standard)*np.float(counts)/np.float(levels)
+        return float(standard)*float(counts)/float(levels)
 
     def convertPWMVoltsToCounts(self, standard, levels, volts):
-        return int(np.round(np.float(levels)*np.float(volts)/np.float(standard)))
+        return int(np.round(float(levels)*float(volts)/float(standard)))
 
     #--------------------------------------------------------------------------
     # Read/Write PWM DAC Output Parameters:
@@ -887,7 +888,7 @@ class SuperLaserLand_JD_RP:
     # Read/Write Frequency Counter Parameters:
     #
 
-    def setCounterMode(self, bTriangular):
+    def setCounterMode(self, bTriangular: int):
         assert isinstance(bTriangular, int)
         if self.bVerbose == True:
             print('setCounterMode')
@@ -1074,7 +1075,7 @@ class SuperLaserLand_JD_RP:
         # Samples #4 and 5 (counting from 0) contain the DDC reference exponential for this data packet:
         ref_exp_expected_position = 6
         magic_bytes_expected_position = ref_exp_expected_position+2
-        ref_exp = samples_out[ref_exp_expected_position].astype(np.float) + 1j * samples_out[ref_exp_expected_position+1].astype(np.float)
+        ref_exp = samples_out[ref_exp_expected_position].astype(float) + 1j * samples_out[ref_exp_expected_position+1].astype(float)
         # ref_exp is the reference phasor at sample #4, we need to extrapolate it to the first correct output sample (#6, or two samples later)
 
         if self.last_selector ==  0 or self.last_selector == 1:
@@ -1218,13 +1219,13 @@ class SuperLaserLand_JD_RP:
         # While the overall gain is:
         # That is, a pure loop-back system from the output of the VNA to the input will
         #  give a modulus equal to overall_gain.
-        overall_gain = np.array(2.**(15-1) * self.output_gain * float((self.number_of_cycles_integration)), dtype=np.float) # the additionnal divide by two is because cos(x) = 1/2*exp(jx)+1/2*exp(-jx)
-        overall_gain = 2.**(15-1) * self.output_gain * integration_time.astype(np.float) # the additionnal divide by two is because cos(x) = 1/2*exp(jx)+1/2*exp(-jx)
+        overall_gain = np.array(2.**(15-1) * self.output_gain * float((self.number_of_cycles_integration)), dtype=float) # the additionnal divide by two is because cos(x) = 1/2*exp(jx)+1/2*exp(-jx)
+        overall_gain = 2.**(15-1) * self.output_gain * integration_time.astype(float) # the additionnal divide by two is because cos(x) = 1/2*exp(jx)+1/2*exp(-jx)
 #        print(self.number_of_cycles_integration)
 #        overall_gain = 1
 #        print('TODO: Remove this line! overallgain = 1')
-        transfer_function_real = (integrator_real.astype(np.float)) / (overall_gain)
-        transfer_function_imag = (integrator_imag.astype(np.float)) / (overall_gain)
+        transfer_function_real = (integrator_real.astype(float)) / (overall_gain)
+        transfer_function_imag = (integrator_imag.astype(float)) / (overall_gain)
         transfer_function_complex = transfer_function_real + 1j * transfer_function_imag
 #        phi = np.angle(transfer_function_real + 1j*transfer_function_imag)
 #        group_delay = ((-np.diff(phi)+np.pi) % (2*np.pi))-np.pi

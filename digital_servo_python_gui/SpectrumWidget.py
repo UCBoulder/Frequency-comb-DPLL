@@ -1,6 +1,6 @@
 from __future__ import print_function
 import time
-from PyQt5 import QtGui, Qt, QtCore, QtWidgets
+from PyQt5 import QtGui, QtCore, QtWidgets
 #import PyQt5.Qwt5 as Qwt
 import numpy as np
 import math
@@ -23,7 +23,7 @@ def round_to_N_sig_figs(x, Nsigfigs):
     return np.round(x * factor)/factor
 
 
-class SpectrumWidget(QtGui.QWidget):
+class SpectrumWidget(QtWidgets.QWidget):
     def __init__(self, parent, selected_ADC, output_controls, sl, PalNormal=None):
         super(SpectrumWidget, self).__init__()
 
@@ -47,44 +47,44 @@ class SpectrumWidget(QtGui.QWidget):
         ######################################################################
         # Spectrum analyzer/Diagnostics
         ######################################################################
-        self.qgroupbox_diagnostics = Qt.QGroupBox('Spectrum analyzer/diagnostics (all computed from raw ADC input)', self)
+        self.qgroupbox_diagnostics = QtWidgets.QGroupBox('Spectrum analyzer/diagnostics (all computed from raw ADC input)', self)
 
         # Create the scale which indicates the ADC fill ratio:
-        self.qlabel_adc_fill = Qt.QLabel('ADC fill\n[bits]')
-        self.qlabel_adc_fill.setAlignment(Qt.Qt.AlignHCenter)
+        self.qlabel_adc_fill = QtWidgets.QLabel('ADC fill\n[bits]')
+        self.qlabel_adc_fill.setAlignment(QtCore.Qt.AlignHCenter)
         
         self.qadc0_scale = ThermometerWidget()#Qwt.QwtThermo()
         #self.qadc0_scale.setOrientation(Qt.Qt.Vertical, Qwt.QwtThermo.LeftScale)
         self.qadc0_scale.setRange(0, 16)
         #self.qadc0_scale.setScale(0, 16)
         self.qadc0_scale.setValue(0)
-        self.qadc0_scale.setFillColor(Qt.Qt.blue)
+        self.qadc0_scale.setFillColor(QtCore.Qt.blue)
         ticksListMajor = [0, 5, 10, 15]
         ticksListMinor = [2.5, 7.5, 12.5]
         ticksLabelMajor = list(map(str, ticksListMajor))
         self.qadc0_scale.setTicks(ticksListMajor, ticksListMinor, ticksLabelMajor)
         
-        self.qlabel_adc_fill_value = Qt.QLabel('10 bits')
-        self.qlabel_adc_fill_value.setAlignment(Qt.Qt.AlignHCenter)
+        self.qlabel_adc_fill_value = QtWidgets.QLabel('10 bits')
+        self.qlabel_adc_fill_value.setAlignment(QtCore.Qt.AlignHCenter)
         
         # Create the scale which indicates the baseband SNR:
-        self.qlabel_baseband_snr = Qt.QLabel('SNR\n[dB]')
-        self.qlabel_baseband_snr.setAlignment(Qt.Qt.AlignHCenter)       
+        self.qlabel_baseband_snr = QtWidgets.QLabel('SNR\n[dB]')
+        self.qlabel_baseband_snr.setAlignment(QtCore.Qt.AlignHCenter)       
         
         self.qthermo_baseband_snr = ThermometerWidget()#Qwt.QwtThermo()
         #self.qthermo_baseband_snr.setOrientation(Qt.Qt.Vertical, Qwt.QwtThermo.LeftScale)
         self.qthermo_baseband_snr.setRange(0, 50)
         self.qthermo_baseband_snr.setScale(0, 50)
         self.qthermo_baseband_snr.setValue(0)
-        self.qthermo_baseband_snr.setFillColor(Qt.Qt.blue)
+        self.qthermo_baseband_snr.setFillColor(QtCore.Qt.blue)
         ticksListMajor = [0, 10, 20, 30, 40, 50]
         ticksListMinor = [5, 15, 25, 35, 45]
         ticksLabelMajor = list(map(str, ticksListMajor))
         self.qthermo_baseband_snr.setTicks(ticksListMajor, ticksListMinor, ticksLabelMajor)
         
         
-        self.qlabel_baseband_snr_value = Qt.QLabel('20 dB')
-        self.qlabel_baseband_snr_value.setAlignment(Qt.Qt.AlignHCenter)
+        self.qlabel_baseband_snr_value = QtWidgets.QLabel('20 dB')
+        self.qlabel_baseband_snr_value.setAlignment(QtCore.Qt.AlignHCenter)
         
         
 
@@ -99,8 +99,8 @@ class SpectrumWidget(QtGui.QWidget):
         
         for k in range(3):
             if self.output_controls[k] == True:
-                self.qlabel_dac_current[k] = Qt.QLabel('Output\nDAC %d [V]' % k)
-                self.qlabel_dac_current[k].setAlignment(Qt.Qt.AlignHCenter)
+                self.qlabel_dac_current[k] = QtWidgets.QLabel('Output\nDAC %d [V]' % k)
+                self.qlabel_dac_current[k].setAlignment(QtCore.Qt.AlignHCenter)
                 
                 self.qthermo_dac_current[k] = ThermometerWidget()#Qwt.QwtThermo()
                 #self.qthermo_dac_current[k].setOrientation(Qt.Qt.Vertical, Qwt.QwtThermo.LeftScale)
@@ -108,7 +108,7 @@ class SpectrumWidget(QtGui.QWidget):
                 self.qthermo_dac_current[k].setScale(self.sl.convertDACCountsToVolts(k, self.sl.DACs_limit_low[k]), self.sl.convertDACCountsToVolts(k, self.sl.DACs_limit_high[k]))
                 self.qthermo_dac_current[k].setValue(0)
                 #self.qthermo_dac_current[k].setFillBrush(Qt.QBrush(Qt.QColor(0, 186, 52)))
-                self.qthermo_dac_current[k].setFillColor(Qt.QColor(0, 186, 52))
+                self.qthermo_dac_current[k].setFillColor(QtGui.QColor(0, 186, 52))
                 if k == 2:
                     ticksListMajor = [0, 1, 2, 3]
                     ticksListMinor = [0.5, 1.5, 2.5]
@@ -119,41 +119,41 @@ class SpectrumWidget(QtGui.QWidget):
                 self.qthermo_dac_current[k].setTicks(ticksListMajor, ticksListMinor, ticksLabelMajor)
                 
                 
-                self.qlabel_dac_offset[k] = Qt.QLabel('Offset\nDAC %d [V]' % k)
-                self.qlabel_dac_offset[k].setAlignment(Qt.Qt.AlignHCenter)
+                self.qlabel_dac_offset[k] = QtWidgets.QLabel('Offset\nDAC %d [V]' % k)
+                self.qlabel_dac_offset[k].setAlignment(QtCore.Qt.AlignHCenter)
                 
-                self.q_dac_offset[k] = Qt.QSlider()
+                self.q_dac_offset[k] = QtWidgets.QSlider()
                 self.q_dac_offset[k].valueChanged.connect(self.setDACOffset_event)
                 self.q_dac_offset[k].setSliderPosition(0)
-                self.q_dac_offset[k].setOrientation(Qt.Qt.Vertical)
+                self.q_dac_offset[k].setOrientation(QtCore.Qt.Vertical)
                 
                 # Units are millionth of the full range available between the min and max DAC value
                 self.q_dac_offset[k].setMinimum(0)
                 self.q_dac_offset[k].setMaximum(1e6)
 
         
-                self.qlabel_dac_current_value[k] = Qt.QLabel('0 V')
+                self.qlabel_dac_current_value[k] = QtWidgets.QLabel('0 V')
                 self.qlabel_dac_current_value[k].setAlignment(Qt.Qt.AlignHCenter)
                 
-                self.qlabel_dac_offset_value[k] = Qt.QLabel('0 V')
-                self.qlabel_dac_offset_value[k].setAlignment(Qt.Qt.AlignHCenter)
+                self.qlabel_dac_offset_value[k] = QtWidgets.QLabel('0 V')
+                self.qlabel_dac_offset_value[k].setAlignment(QtCore.Qt.AlignHCenter)
             
         
         # Create widgets to set the number of points for the graphs:
-        self.qlabel_rawdata_rbw = Qt.QLabel('RBW: 100 kHz; Points:')
-        self.qedit_rawdata_length = Qt.QLineEdit('1.73e3')
+        self.qlabel_rawdata_rbw = QtWidgets.QLabel('RBW: 100 kHz; Points:')
+        self.qedit_rawdata_length = QtWidgets.QLineEdit('1.73e3')
         self.qedit_rawdata_length.setMaximumWidth(60)
         
         # Plot type select
-        self.qlabel_adc_plot_type = Qt.QLabel('Plot type:')
-        self.qcombo_adc_plottype = Qt.QComboBox()
+        self.qlabel_adc_plot_type = QtWidgets.QLabel('Plot type:')
+        self.qcombo_adc_plottype = QtWidgets.QComboBox()
         self.qcombo_adc_plottype.addItems(['Spectrum', 'Time: raw input', 'Time: Phase', 'Time: IQ', 'Time: IQ, synced'])
 
         
 
         # Input select        
-        self.qlabel_adc_plot_input = Qt.QLabel('Input:')
-        self.qcombo_adc_plot = Qt.QComboBox()
+        self.qlabel_adc_plot_input = QtWidgets.QLabel('Input:')
+        self.qcombo_adc_plot = QtWidgets.QComboBox()
         self.qcombo_adc_plot.addItems(['ADC0', 'ADC1', 'DAC0', 'DAC1', 'DAC2'])
         self.qcombo_adc_plot.setCurrentIndex(self.selected_ADC)
         
@@ -174,7 +174,7 @@ class SpectrumWidget(QtGui.QWidget):
         self.qplt_IQ.setFixedSize(100, 100)
 #        self.qplt_IQ.setsetHeightForWidth(True)
         # qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Preferred, Qt.QSizePolicy.Preferred)
-        qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.Fixed)
+        qPolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         # qPolicy.setHeightForWidth(True)
         self.qplt_IQ.setSizePolicy(qPolicy)
         
@@ -190,7 +190,7 @@ class SpectrumWidget(QtGui.QWidget):
         self.qplt_IQ.hideAxis('left')
         self.qplt_IQ.hideAxis('bottom')
 
-        self.lblplt_IQ_title = Qt.QLabel('Baseband IQ:')
+        self.lblplt_IQ_title = QtWidgets.QLabel('Baseband IQ:')
         
         # Create the curves in the plot
         self.curve_IQ = self.qplt_IQ.getPlotItem().plot(pen = None, symbol = 'o', symbolPen=None, symbolSize=3, symbolBrush='b')
@@ -221,7 +221,7 @@ class SpectrumWidget(QtGui.QWidget):
         self.curve_filter = self.plt_spc.getPlotItem().plot(pen='r')
         
         # Put all the widgets into a grid layout
-        grid = QtGui.QGridLayout()
+        grid = QtWidgets.QGridLayout()
         grid.setSpacing(5)
         grid.addWidget(self.qlabel_adc_fill,        0, 0)
         grid.addWidget(self.qadc0_scale,            1, 0, 3, 1)
@@ -250,7 +250,7 @@ class SpectrumWidget(QtGui.QWidget):
         grid.setRowStretch(1, 1)
 
         # The plots:
-        qhoriz = Qt.QHBoxLayout()
+        qhoriz = QtWidgets.QHBoxLayout()
         qhoriz.addWidget(self.lblplt_IQ_title)
         qhoriz.addWidget(self.qplt_IQ)
         qhoriz.addStretch(1)
@@ -277,7 +277,7 @@ class SpectrumWidget(QtGui.QWidget):
         self.qgroupbox_diagnostics.setLayout(grid)    
         self.qgroupbox_diagnostics.setAutoFillBackground(True)
 
-        vbox = Qt.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addWidget(self.qgroupbox_diagnostics)
         self.setLayout(vbox)
 

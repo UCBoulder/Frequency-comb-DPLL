@@ -7,7 +7,8 @@ Created on Fri Aug 26 00:26:50 2016
 from __future__ import print_function
 
 import sys
-from PyQt5 import QtGui, Qt, QtWidgets
+from PyQt5 import QtGui, QtWidgets
+from PyQt5.QtCore import Qt
 #import numpy as np
 import UDPRedPitayaDiscovery
 
@@ -20,7 +21,7 @@ class initialConfiguration(QtWidgets.QDialog):
 
 
 
-    def __init__(self, dev, controller, devices_data={}, strBroadcastAddress="192.168.2.255", strFPGAFirmware='', strCPUFirmware=''):
+    def __init__(self, dev, controller, devices_data={}, strBroadcastAddress="192.168.1.255", strFPGAFirmware='', strCPUFirmware=''):
         super(initialConfiguration, self).__init__()
 
         # copy init parameters to member variables
@@ -56,32 +57,32 @@ class initialConfiguration(QtWidgets.QDialog):
 
     def initUI(self):
         # init the UI
-        self.qlabel_serial = Qt.QLabel('Connected FPGAs')
-        self.qlabel_broadcast = Qt.QLabel('UDP Broadcast address')
-        self.qlabel_firmware = Qt.QLabel('FPGA Firmware file')
-        self.qlabel_software = Qt.QLabel('CPU Software file')
-        self.qcombo_serial = Qt.QComboBox()
+        self.qlabel_serial = QtWidgets.QLabel('Connected FPGAs')
+        self.qlabel_broadcast = QtWidgets.QLabel('UDP Broadcast address')
+        self.qlabel_firmware = QtWidgets.QLabel('FPGA Firmware file')
+        self.qlabel_software = QtWidgets.QLabel('CPU Software file')
+        self.qcombo_serial = QtWidgets.QComboBox()
         self.qcombo_serial.setMinimumContentsLength(100)    # I can't figure out how to make it scale correctly with content so we'll make it big enough...
-        self.qcombo_serial.setSizeAdjustPolicy(Qt.QComboBox.AdjustToMinimumContentsLength)
+        self.qcombo_serial.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToMinimumContentsLength)
 
-        self.qedit_broadcast = Qt.QLineEdit(self.strBroadcastAddress)
-        self.qedit_firmware = Qt.QLineEdit(self.strFPGAFirmware)
-        self.qedit_software = Qt.QLineEdit(self.strCPUFirmware)
+        self.qedit_broadcast = QtWidgets.QLineEdit(self.strBroadcastAddress)
+        self.qedit_firmware = QtWidgets.QLineEdit(self.strFPGAFirmware)
+        self.qedit_software = QtWidgets.QLineEdit(self.strCPUFirmware)
 
-        self.qbtn_send_broadcast = Qt.QPushButton('Broadcast discovery packet')
-        self.qbtn_reprogram_fpga = Qt.QPushButton('Update FPGA firmware')
-        self.qbtn_reprogram_cpu = Qt.QPushButton('Update CPU software')
+        self.qbtn_send_broadcast = QtWidgets.QPushButton('Broadcast discovery packet')
+        self.qbtn_reprogram_fpga = QtWidgets.QPushButton('Update FPGA firmware')
+        self.qbtn_reprogram_cpu = QtWidgets.QPushButton('Update CPU software')
         self.qbtn_send_broadcast.clicked.connect(self.reset_list_and_send_broadcast)
         self.qbtn_reprogram_fpga.clicked.connect(self.programFPGAClicked)
         self.qbtn_reprogram_cpu.clicked.connect(self.programCPUClicked)
 
-        self.qradio_reprogram = Qt.QRadioButton('Send default values')
-        self.qradio_noreprogram = Qt.QRadioButton('Connect to an already running box (NOT WORKING YET)')
+        self.qradio_reprogram = QtWidgets.QRadioButton('Send default values')
+        self.qradio_noreprogram = QtWidgets.QRadioButton('Connect to an already running box (NOT WORKING YET)')
         self.qradio_reprogram.setChecked(True)
 
         self.qradio_noreprogram.setDisabled(True)
 
-        btn_group = Qt.QButtonGroup(self)
+        btn_group = QtWidgets.QButtonGroup(self)
         btn_group.addButton(self.qradio_reprogram)
         btn_group.setId(self.qradio_reprogram, 0)
         btn_group.addButton(self.qradio_noreprogram)
@@ -95,25 +96,25 @@ class initialConfiguration(QtWidgets.QDialog):
 
 
 
-        self.qbtn_yes = Qt.QPushButton('OK')
-        self.qbtn_no = Qt.QPushButton('Cancel')
+        self.qbtn_yes = QtWidgets.QPushButton('OK')
+        self.qbtn_no = QtWidgets.QPushButton('Cancel')
 
         self.qbtn_yes.clicked.connect(self.okClicked)
         self.qbtn_no.clicked.connect(self.cancelClicked)
 
 
-        self.qgroupbox_IP_addr = Qt.QGroupBox('IP Address')
-        gridIP = Qt.QGridLayout()
+        self.qgroupbox_IP_addr = QtWidgets.QGroupBox('IP Address')
+        gridIP = QtWidgets.QGridLayout()
 
 
 
-        self.qradio_usefromlist = Qt.QRadioButton('Use listed')
-        self.qradio_usefromtextbox = Qt.QRadioButton('Use manual entry')
-        self.qradio_usefromtextbox.setChecked(False)
-        self.qradio_usefromlist.setChecked(True)
+        self.qradio_usefromlist = QtWidgets.QRadioButton('Use listed')
+        self.qradio_usefromtextbox = QtWidgets.QRadioButton('Use manual entry')
+        self.qradio_usefromtextbox.setChecked(True)
+        self.qradio_usefromlist.setChecked(False)
 
-        self.qlabel_manual_entry = Qt.QLabel('Manual IP entry')
-        self.qedit_manual_entry = Qt.QLineEdit('192.168.0.150')
+        self.qlabel_manual_entry = QtWidgets.QLabel('Manual IP entry')
+        self.qedit_manual_entry = QtWidgets.QLineEdit('192.168.1.11')
 
 
         gridIP.addWidget(self.qradio_usefromtextbox, 0, 0)
@@ -133,12 +134,12 @@ class initialConfiguration(QtWidgets.QDialog):
         self.qgroupbox_IP_addr.setLayout(gridIP)
 
 
-        self.qgroupbox_connection = Qt.QGroupBox('Red Pitaya Connection')
-        gridConnection = Qt.QGridLayout()
+        self.qgroupbox_connection = QtWidgets.QGroupBox('Red Pitaya Connection')
+        gridConnection = QtWidgets.QGridLayout()
 
-        self.qradio_pushValue = Qt.QRadioButton('Push default values to Red Pitaya')
-        self.qradio_existingRP = Qt.QRadioButton('Reconnect to an already running Red Pitaya')
-        self.qradio_noRP = Qt.QRadioButton('Open the GUI without any Red Pitaya')
+        self.qradio_pushValue = QtWidgets.QRadioButton('Push default values to Red Pitaya')
+        self.qradio_existingRP = QtWidgets.QRadioButton('Reconnect to an already running Red Pitaya')
+        self.qradio_noRP = QtWidgets.QRadioButton('Open the GUI without any Red Pitaya')
         self.qradio_existingRP.setChecked(True)
 
         gridConnection.addWidget(self.qradio_pushValue,        0, 0)
@@ -154,7 +155,7 @@ class initialConfiguration(QtWidgets.QDialog):
 #        btn_group2.setId(self.qradio_clk_external, 3)
 #        self.close.connect(self.closeEvent)
 
-        grid = Qt.QGridLayout()
+        grid = QtWidgets.QGridLayout()
 
         grid.addWidget(self.qgroupbox_IP_addr, 2, 0, 1, 3)
 
@@ -178,7 +179,7 @@ class initialConfiguration(QtWidgets.QDialog):
 
 #        grid.addWidget(self.qbtn_yes, 4, 0)
 #        grid.addWidget(self.qbtn_no, 4, 1)
-        hbox = Qt.QHBoxLayout()
+        hbox = QtWidgets.QHBoxLayout()
         hbox.addStretch(1)
         hbox.addWidget(self.qbtn_yes)
         hbox.addWidget(self.qbtn_no)
@@ -278,8 +279,11 @@ class initialConfiguration(QtWidgets.QDialog):
         else:
             # use manual entry IP address
             # we don't have a good way of populating the MAC and serial number yet using this manual connection
+            
             print("using manual entry")
             self.strSelectedIP = str(self.qedit_manual_entry.text())
+            # TODO read name and MAC address
+            self.strSelectedName = self.strSelectedIP
 
     def okClicked(self):
         self.bOk = True

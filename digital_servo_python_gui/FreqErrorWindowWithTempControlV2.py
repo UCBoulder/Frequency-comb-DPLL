@@ -7,7 +7,7 @@ from __future__ import print_function
 
 import sys
 import time
-from PyQt5 import QtGui, Qt, QtCore, QtWidgets
+from PyQt5 import QtGui, QtCore, QtWidgets
 #import PyQt5.Qwt5 as Qwt
 import numpy as np
 import math
@@ -207,7 +207,7 @@ class FreqErrorWindowWithTempControlV2(QtWidgets.QWidget):
     def initUI(self):
 
         # Put everything in a groupbox so we can change the border of the window without it looking too obnoxious:
-        self.qgroupbox_freq = Qt.QGroupBox('')
+        self.qgroupbox_freq = QtWidgets.QGroupBox('')
         self.qgroupbox_freq.setAutoFillBackground(True)
 
         # Add a QwtPlot to the UI:
@@ -246,35 +246,35 @@ class FreqErrorWindowWithTempControlV2(QtWidgets.QWidget):
 
 
         # Create widgets to specify buffer length and clear buffer:
-        self.qbtn_reset = Qt.QPushButton('Clear display')
+        self.qbtn_reset = QtWidgets.QPushButton('Clear display')
         self.qbtn_reset.clicked.connect(self.initBuffer)
-        self.qlabel_history = Qt.QLabel('Display [s]')
-        self.qedit_history = Qt.QLineEdit('600')
+        self.qlabel_history = QtWidgets.QLabel('Display [s]')
+        self.qedit_history = QtWidgets.QLineEdit('600')
         self.qedit_history.setMaximumWidth(40)
         self.qedit_history.textChanged.connect(self.initBuffer)
 
 
-        self.qchk_fullscale_freq = Qt.QCheckBox('Fullscale Freq Graph')
+        self.qchk_fullscale_freq = QtWidgets.QCheckBox('Fullscale Freq Graph')
         self.qchk_fullscale_freq.setChecked(True)
 
-        self.qchk_fullscale_dac = Qt.QCheckBox('Fullscale DAC Graph')
+        self.qchk_fullscale_dac = QtWidgets.QCheckBox('Fullscale DAC Graph')
         self.qchk_fullscale_dac.setChecked(True)
 
-        self.qchk_triangular = Qt.QCheckBox('Triangular averaging')
+        self.qchk_triangular = QtWidgets.QCheckBox('Triangular averaging')
         self.qchk_triangular.setChecked(True)
         self.qchk_triangular.clicked.connect(self.chkTriangular_checked)
 
         # Controls for the vertical scale of the frequency graph:
         print(type(self.sl.dev.ADC_CLK_Hz))
         print(self.sl.dev.ADC_CLK_Hz)
-        self.qedit_ymin = Qt.QLineEdit('%f' % (-self.sl.dev.ADC_CLK_Hz/4.))
-        self.qedit_ymax = Qt.QLineEdit('%f' % (self.sl.dev.ADC_CLK_Hz/4.))
+        self.qedit_ymin = QtWidgets.QLineEdit('%f' % (-self.sl.dev.ADC_CLK_Hz/4.))
+        self.qedit_ymax = QtWidgets.QLineEdit('%f' % (self.sl.dev.ADC_CLK_Hz/4.))
 
         # Controls for Auto Recovery
-        self.qchk_autorecover = Qt.QCheckBox('Auto Recover')
+        self.qchk_autorecover = QtWidgets.QCheckBox('Auto Recover')
         self.qchk_autorecover.setChecked(False)
-        self.qlabel_rec_thresh = Qt.QLabel('Recovery Threshold')
-        self.qedit_rec_thresh = Qt.QLineEdit('5')
+        self.qlabel_rec_thresh = QtWidgets.QLabel('Recovery Threshold')
+        self.qedit_rec_thresh = QtWidgets.QLineEdit('5')
         self.qedit_rec_thresh.setMaximumWidth(40)
 
         # Put the two graphs into a vertical box layout, so that they share all the vertical space equally:
@@ -304,27 +304,27 @@ class FreqErrorWindowWithTempControlV2(QtWidgets.QWidget):
 
         if self.client or True:
             # we need to add the controls which implement the temperature control loop:
-            self.qlabel_threshold_step = Qt.QLabel('Threshold for step:')
-            self.qedit_threshold_step = Qt.QLineEdit('0.2')
+            self.qlabel_threshold_step = QtWidgets.QLabel('Threshold for step:')
+            self.qedit_threshold_step = QtWidgets.QLineEdit('0.2')
             self.qedit_threshold_step.setMaximumWidth(40)
 
 
-            self.qlabel_threshold_disable = Qt.QLabel('Threshold for disable:')
-            self.qedit_threshold_disable = Qt.QLineEdit('0.05')
+            self.qlabel_threshold_disable = QtWidgets.QLabel('Threshold for disable:')
+            self.qedit_threshold_disable = QtWidgets.QLineEdit('0.05')
             self.qedit_threshold_disable.setMaximumWidth(40)
 
-            self.qlabel_step_size = Qt.QLabel('Step size [deg C]:')
-            self.qedit_step_size = Qt.QLineEdit('0.05')
+            self.qlabel_step_size = QtWidgets.QLabel('Step size [deg C]:')
+            self.qedit_step_size = QtWidgets.QLineEdit('0.05')
             self.qedit_step_size.setMaximumWidth(40)
 
-            self.qlabel_step_delay = Qt.QLabel('Step delay [s]:')
-            self.qedit_step_delay = Qt.QLineEdit('120')
+            self.qlabel_step_delay = QtWidgets.QLabel('Step delay [s]:')
+            self.qedit_step_delay = QtWidgets.QLineEdit('120')
             self.qedit_step_delay.setMaximumWidth(40)
 
-            self.qchk_temp_control = Qt.QCheckBox('Temperature control')
+            self.qchk_temp_control = QtWidgets.QCheckBox('Temperature control')
             self.qchk_temp_control.setChecked(False)
 
-            self.qchk_clear_temp_control = Qt.QCheckBox('Clear Temperature control')
+            self.qchk_clear_temp_control = QtWidgets.QCheckBox('Clear Temperature control')
             self.qchk_clear_temp_control.setChecked(False)
 
             #FEATURE
@@ -342,21 +342,21 @@ class FreqErrorWindowWithTempControlV2(QtWidgets.QWidget):
             #grid.addWidget(self.qchk_clear_temp_control,        15, 0, 1, 2)
 
 
-            grid.addWidget(Qt.QLabel(''),                       16, 0, 1, 2)
+            grid.addWidget(QtWidgets.QLabel(''),                       16, 0, 1, 2)
             grid.setRowStretch(15, 1)
             grid.setColumnStretch(2, 1)
         else:
             # no controls for the temp control loop
 
 
-            grid.addWidget(Qt.QLabel(''),                       8, 0, 1, 2)
+            grid.addWidget(QtWidgets.QLabel(''),                       8, 0, 1, 2)
             grid.setRowStretch(8, 1)
             grid.setColumnStretch(2, 1)
 
 
         self.qgroupbox_freq.setLayout(grid)
 
-        vbox2 = Qt.QVBoxLayout()
+        vbox2 = QtWidgets.QVBoxLayout()
         vbox2.addWidget(self.qgroupbox_freq)
         self.setLayout(vbox2)
 
@@ -377,9 +377,9 @@ class FreqErrorWindowWithTempControlV2(QtWidgets.QWidget):
 #        qr.moveCenter(cp)
 #        self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(800+100, 50))
         if self.output_number == 0:
-            self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(985, 10))
+            self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + QtCore.QPoint(985, 10))
         else:
-            self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(985, 10+450+80))
+            self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + QtCore.QPoint(985, 10+450+80))
 
     def timerEvent(self, e):
 

@@ -7,7 +7,7 @@ from __future__ import print_function
 
 import sys
 import time
-from PyQt5 import QtGui, Qt, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 #import PyQt5.Qwt5 as Qwt
 import numpy as np
 import math
@@ -149,7 +149,7 @@ class DisplayTransferFunctionWindow(QtWidgets.QWidget):
         #print('DisplayTransferFunctionWindow:writeOutputFile(): 2')
 
         # Open file for output
-        self.strNameTemplate = time.strftime("transfer_functions\%m_%d_%Y_%H_%M_%S")
+        self.strNameTemplate = os.path.join("transfer_functions", time.strftime("%m_%d_%Y_%H_%M_%S_"))
         #print('DisplayTransferFunctionWindow:writeOutputFile(): 3')
         if bCalibrated:
             strCurrentName1 = self.strNameTemplate + ('_no_%03d_with_cal.txt' % (self.window_number))
@@ -230,27 +230,27 @@ class DisplayTransferFunctionWindow(QtWidgets.QWidget):
         ######################################################################
 
         # Units select
-        units_label = Qt.QLabel('Units:')
-        self.qcombo_units = Qt.QComboBox()
+        units_label = QtWidgets.QLabel('Units:')
+        self.qcombo_units = QtWidgets.QComboBox()
         self.qcombo_units.addItems(['dB', 'Linear', 'real part', 'imag part', 'Ohms, 50*Vin/Vout', 'Ohms, shunt DUT, 50 ohms probe', 'Ohms, Shunt DUT, high-Z probe + Series source impedance'])
         self.qcombo_units.setCurrentIndex(0)
 #        self.qcombo_units.changeEvent.connect(self.updateGraph)
         self.qcombo_units.currentIndexChanged.connect(self.updateGraph)
 
-        self.qlabel_SeriesImpedance = Qt.QLabel('Series Impedance [Ohms]:')
-        self.qedit_SeriesImpedance = Qt.QLineEdit('100e3')
+        self.qlabel_SeriesImpedance = QtWidgets.QLabel('Series Impedance [Ohms]:')
+        self.qedit_SeriesImpedance = QtWidgets.QLineEdit('100e3')
         self.qedit_SeriesImpedance.editingFinished.connect(self.updateGraph)
 
-        self.qchk_display_model = Qt.QCheckBox('Display model')
+        self.qchk_display_model = QtWidgets.QCheckBox('Display model')
         self.qchk_display_model.setChecked(False)
 
-        self.qchk_DDCFilter = Qt.QCheckBox('DDC sinc filter')
+        self.qchk_DDCFilter = QtWidgets.QCheckBox('DDC sinc filter')
         self.qchk_DDCFilter.clicked.connect(self.updateGraph)
 
-        self.qradio_signp = Qt.QRadioButton('+ Sign')
+        self.qradio_signp = QtWidgets.QRadioButton('+ Sign')
         self.qradio_signp.setChecked(True)
-        self.qradio_signn = Qt.QRadioButton('- Sign')
-        button_group = Qt.QButtonGroup()
+        self.qradio_signn = QtWidgets.QRadioButton('- Sign')
+        button_group = QtWidgets.QButtonGroup()
         button_group.addButton(self.qradio_signp)
         button_group.addButton(self.qradio_signn)
 
@@ -259,14 +259,14 @@ class DisplayTransferFunctionWindow(QtWidgets.QWidget):
 
         # set the default DC gain to the value of the transfer function at the lowest frequency:
 
-        self.qlabel_k = Qt.QLabel('DC Gain [dB]')
-        self.qedit_k = Qt.QLineEdit(str(0))
+        self.qlabel_k = QtWidgets.QLabel('DC Gain [dB]')
+        self.qedit_k = QtWidgets.QLineEdit(str(0))
         self.qedit_k.setMaximumWidth(60)
         self.qedit_k.textChanged.connect(self.updateGraph)
 
 
-        self.qlabel_f1 = Qt.QLabel('1st order poles')
-        self.qedit_f1 = Qt.QLineEdit('20e3,600e3')
+        self.qlabel_f1 = QtWidgets.QLabel('1st order poles')
+        self.qedit_f1 = QtWidgets.QLineEdit('20e3,600e3')
         self.qedit_f1.setMaximumWidth(120)
         self.qedit_f1.textChanged.connect(self.updateGraph)
 
@@ -274,47 +274,47 @@ class DisplayTransferFunctionWindow(QtWidgets.QWidget):
 
 
 
-        self.qlabel_f0 = Qt.QLabel('2nd order poles')
-        self.qedit_f0 = Qt.QLineEdit('1.5e6')
+        self.qlabel_f0 = QtWidgets.QLabel('2nd order poles')
+        self.qedit_f0 = QtWidgets.QLineEdit('1.5e6')
         self.qedit_f0.setMaximumWidth(120)
         self.qedit_f0.textChanged.connect(self.updateGraph)
 
-        self.qlabel_zeta = Qt.QLabel('zeta')
-        self.qedit_zeta = Qt.QLineEdit('0.1')
+        self.qlabel_zeta = QtWidgets.QLabel('zeta')
+        self.qedit_zeta = QtWidgets.QLineEdit('0.1')
         self.qedit_zeta.setMaximumWidth(120)
         self.qedit_zeta.textChanged.connect(self.updateGraph)
 
-        self.qlabel_T = Qt.QLabel('Pure delay')
-        self.qedit_T = Qt.QLineEdit('570e-9')
+        self.qlabel_T = QtWidgets.QLabel('Pure delay')
+        self.qedit_T = QtWidgets.QLineEdit('570e-9')
         self.qedit_T.setMaximumWidth(60)
         self.qedit_T.textChanged.connect(self.updateGraph)
 
 
 
-        self.qchk_controller = Qt.QCheckBox('Closed-loop prediction')
+        self.qchk_controller = QtWidgets.QCheckBox('Closed-loop prediction')
         self.qchk_controller.clicked.connect(self.updateGraph)
 
 
-        self.qlabel_pgain = Qt.QLabel('P gain [dB]')
-        self.qedit_pgain = Qt.QLineEdit('-100')
+        self.qlabel_pgain = QtWidgets.QLabel('P gain [dB]')
+        self.qedit_pgain = QtWidgets.QLineEdit('-100')
         self.qedit_pgain.setMaximumWidth(60)
         self.qedit_pgain.textChanged.connect(self.updateGraph)
 
-        self.qlabel_icorner = Qt.QLabel('I corner [Hz]')
-        self.qedit_icorner = Qt.QLineEdit('0')
+        self.qlabel_icorner = QtWidgets.QLabel('I corner [Hz]')
+        self.qedit_icorner = QtWidgets.QLineEdit('0')
         self.qedit_icorner.setMaximumWidth(60)
         self.qedit_icorner.textChanged.connect(self.updateGraph)
 
 
 
-        self.qedit_comment = Qt.QTextEdit('')
+        self.qedit_comment = QtWidgets.QTextEdit('')
 #        self.qedit_comment.setMaximumWidth(80)
         #self.qedit_comment.textChanged.connect(self.updateGraph)
 
 
 
         # Put all the widgets into a grid layout
-        grid = Qt.QGridLayout()
+        grid = QtWidgets.QGridLayout()
 
 
         grid.addWidget(units_label, 0, 0)
@@ -357,12 +357,12 @@ class DisplayTransferFunctionWindow(QtWidgets.QWidget):
 #        grid.addWidget(Qt.QLabel(''), 12, 0, 1, 2)
 #        grid.setRowStretch(14, 1)
 
-        vbox = Qt.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addWidget(self.qplt_mag)
         vbox.addWidget(self.qplt_phase)
 
 
-        hbox = Qt.QHBoxLayout()
+        hbox = QtWidgets.QHBoxLayout()
         hbox.addLayout(grid)
         hbox.addLayout(vbox, 1)
 #        hbox.setStretch(2, 1)

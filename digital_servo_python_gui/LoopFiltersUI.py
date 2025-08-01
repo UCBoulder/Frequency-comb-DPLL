@@ -6,7 +6,8 @@ Description: Provides a graphical user interface (GUI) for setting the loop filt
 @author: JD Deschenes
 """
 from __future__ import print_function
-from PyQt5 import QtGui, Qt, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt
 #import PyQt5.Qwt5 as Qwt
 import numpy as np
 import weakref
@@ -18,7 +19,7 @@ from user_friendly_QLineEdit import user_friendly_QLineEdit
 # stuff for Python 3 port
 import pyqtgraph as pg
 
-class LoopFiltersUI(Qt.QWidget):
+class LoopFiltersUI(QtWidgets.QWidget):
 
     MINIMUM_GAIN_DISPLAY = 10**(-120/20)
 
@@ -85,7 +86,7 @@ class LoopFiltersUI(Qt.QWidget):
 
         #qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Expanding, Qt.QSizePolicy.Expanding)
         #qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Expanding, Qt.QSizePolicy.Expanding)
-        qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Ignored, Qt.QSizePolicy.Ignored)
+        qPolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         self.qplot_tf.setSizePolicy(qPolicy)
 
         self.curve_0dB = self.qplot_tf.getPlotItem().plot()
@@ -132,31 +133,31 @@ class LoopFiltersUI(Qt.QWidget):
 
 #        self.curve_0dB.setPen(self.qplot_tf)
 
-        self.qlabel_spacerh = Qt.QLabel('')
+        self.qlabel_spacerh = QtWidgets.QLabel('')
         self.qlabel_spacerh.setMinimumWidth(30)
-        self.qlabel_spacerh2 = Qt.QLabel('')
+        self.qlabel_spacerh2 = QtWidgets.QLabel('')
         self.qlabel_spacerh2.setMinimumWidth(7)
-        self.qlabel_spacerv = Qt.QLabel('')
+        self.qlabel_spacerv = QtWidgets.QLabel('')
         self.qlabel_spacerv.setMinimumHeight(25)
 
 
-        self.qchk_lock = Qt.QCheckBox('Lock On')
+        self.qchk_lock = QtWidgets.QCheckBox('Lock On')
         self.qchk_lock.clicked.connect(self.textboxChanged)
         self.qchk_lock.setEnabled(self.bDisplayLockChkBox)
 
 
-        self.qchk_kp = Qt.QCheckBox('Kp On')
+        self.qchk_kp = QtWidgets.QCheckBox('Kp On')
         self.qchk_kp.clicked.connect(self.textboxChanged)
 
-        self.qchk_kd = Qt.QCheckBox('Kd On')
+        self.qchk_kd = QtWidgets.QCheckBox('Kd On')
         self.qchk_kd.clicked.connect(self.textboxChanged)
 
         # Labels and controls to show the settings:
-        self.qlabel_kp = Qt.QLabel('Kp:')
-        self.qlabel_fi = Qt.QLabel('fi:')
-        self.qlabel_fii = Qt.QLabel('fii:')
-        self.qlabel_fd = Qt.QLabel('fd:')
-        self.qlabel_fdf = Qt.QLabel('fdf:')
+        self.qlabel_kp = QtWidgets.QLabel('Kp:')
+        self.qlabel_fi = QtWidgets.QLabel('fi:')
+        self.qlabel_fii = QtWidgets.QLabel('fii:')
+        self.qlabel_fd = QtWidgets.QLabel('fd:')
+        self.qlabel_fdf = QtWidgets.QLabel('fdf:')
         self.qedit_kp = user_friendly_QLineEdit('-60')
         self.qedit_fi = user_friendly_QLineEdit('1e3')
         self.qedit_fii = user_friendly_QLineEdit('1e1')
@@ -174,11 +175,11 @@ class LoopFiltersUI(Qt.QWidget):
         self.qedit_fdf.returnPressed.connect(self.textboxChanged)
 
 
-        self.qchk_bKpCrossing = Qt.QCheckBox('fi refer to kp crossover')
+        self.qchk_bKpCrossing = QtWidgets.QCheckBox('fi refer to kp crossover')
         self.qchk_bKpCrossing.setChecked(False)
         self.qchk_bKpCrossing.clicked.connect(self.textboxChanged)
 
-        self.qchk_lockSlider = Qt.QCheckBox('Lock D sliders')
+        self.qchk_lockSlider = QtWidgets.QCheckBox('Lock D sliders')
         self.qchk_lockSlider.setChecked(False)
         self.qchk_lockSlider.clicked.connect(self.lockSlider)
         self.slider_locked = False
@@ -186,35 +187,35 @@ class LoopFiltersUI(Qt.QWidget):
         self.slider_inhibit = False
 
         # The sliders:
-        self.qslider_kp = Qt.QSlider()
-        self.qslider_fi = Qt.QSlider()
-        self.qslider_fii = Qt.QSlider()
-        self.qslider_fd = Qt.QSlider()
-        self.qslider_fdf = Qt.QSlider()
-        self.qslider_kp.setOrientation(Qt.Qt.Vertical)
-        self.qslider_fi.setOrientation(Qt.Qt.Horizontal)
-        self.qslider_fii.setOrientation(Qt.Qt.Horizontal)
-        self.qslider_fd.setOrientation(Qt.Qt.Horizontal)
-        self.qslider_fdf.setOrientation(Qt.Qt.Horizontal)
+        self.qslider_kp = QtWidgets.QSlider()
+        self.qslider_fi = QtWidgets.QSlider()
+        self.qslider_fii = QtWidgets.QSlider()
+        self.qslider_fd = QtWidgets.QSlider()
+        self.qslider_fdf = QtWidgets.QSlider()
+        self.qslider_kp.setOrientation(Qt.Vertical)
+        self.qslider_fi.setOrientation(Qt.Horizontal)
+        self.qslider_fii.setOrientation(Qt.Horizontal)
+        self.qslider_fd.setOrientation(Qt.Horizontal)
+        self.qslider_fdf.setOrientation(Qt.Horizontal)
 
         # Set bounds:
         (kp, fi, fii, fd, fdf, fmin, fmax, gain_min, gain_max, bLock) = self.getSettings()
         # The fi and fii sliders will contain the value in 100*log10(f) units (similar to dBHz, but with a different scaling - this is because we can only use integer units)
-        self.qslider_fi.setMinimum(100*np.log10(fmin))
-        self.qslider_fii.setMinimum(100*np.log10(fmin))
-        self.qslider_fd.setMinimum(100*np.log10(fmin))
-        self.qslider_fdf.setMinimum(100*np.log10(fmin))
-        self.qslider_fi.setMaximum(100*np.log10(fmax))
-        self.qslider_fii.setMaximum(100*np.log10(fmax))
-        self.qslider_fd.setMaximum(100*np.log10(fmax))
-        self.qslider_fdf.setMaximum(100*np.log10(fmax))
-        self.qslider_kp.setMinimum(10*gain_min)
-        self.qslider_kp.setMaximum(10*gain_max)
-        self.qslider_fi.setValue((100*np.log10(fi)))
-        self.qslider_fii.setValue((100*np.log10(fii)))
-        self.qslider_fd.setValue((100*np.log10(fd)))
-        self.qslider_fdf.setValue((100*np.log10(fdf)))
-        self.qslider_kp.setValue((10*kp))
+        self.qslider_fi.setMinimum(int(100*np.log10(fmin)))
+        self.qslider_fii.setMinimum(int(100*np.log10(fmin)))
+        self.qslider_fd.setMinimum(int(100*np.log10(fmin)))
+        self.qslider_fdf.setMinimum(int(100*np.log10(fmin)))
+        self.qslider_fi.setMaximum(int(100*np.log10(fmax)))
+        self.qslider_fii.setMaximum(int(100*np.log10(fmax)))
+        self.qslider_fd.setMaximum(int(100*np.log10(fmax)))
+        self.qslider_fdf.setMaximum(int(100*np.log10(fmax)))
+        self.qslider_kp.setMinimum(int(10*gain_min))
+        self.qslider_kp.setMaximum(int(10*gain_max))
+        self.qslider_fi.setValue((int(100*np.log10(fi))))
+        self.qslider_fii.setValue((int(100*np.log10(fii))))
+        self.qslider_fd.setValue((int(100*np.log10(fd))))
+        self.qslider_fdf.setValue((int(100*np.log10(fdf))))
+        self.qslider_kp.setValue((int(10*kp)))
 #        print('10*gain_min = %f, 10*gain_min = %f, 10*kp = %f' % (10*gain_min, 10*gain_min, 10*kp))
 
         self.qslider_kp.valueChanged.connect(self.kpSliderEvent)
@@ -226,7 +227,7 @@ class LoopFiltersUI(Qt.QWidget):
 
         # Every control for the proportional gain goes into an hbox:
 
-        vbox = Qt.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         vbox.addStretch(1)
         vbox.addWidget(self.qchk_kp)
         vbox.addWidget(self.qchk_kd)
@@ -234,7 +235,7 @@ class LoopFiltersUI(Qt.QWidget):
 
 
         # Put everything in a grid layout:
-        grid = Qt.QGridLayout()
+        grid = QtWidgets.QGridLayout()
 
 
         grid.addLayout(vbox,                    0, 0, 2, 2)
@@ -478,19 +479,19 @@ class LoopFiltersUI(Qt.QWidget):
         # We block the signals from the sliders so we don't cause infinite recursion
 #        self.qslider_fi.setValue((100*np.log10(fi)))
         self.qslider_fi.blockSignals(True)
-        self.qslider_fi.setValue((100*np.log10(np.max((fi, fmin)))))
+        self.qslider_fi.setValue((int(100*np.log10(np.max((fi, fmin))))))
         self.qslider_fi.blockSignals(False)
         self.qslider_fii.blockSignals(True)
-        self.qslider_fii.setValue((100*np.log10(np.max((fii, fmin)))))
+        self.qslider_fii.setValue((int(100*np.log10(np.max((fii, fmin))))))
         self.qslider_fii.blockSignals(False)
         self.qslider_fd.blockSignals(True)
-        self.qslider_fd.setValue((100*np.log10(np.max((fd, fmin)))))
+        self.qslider_fd.setValue((int(100*np.log10(np.max((fd, fmin))))))
         self.qslider_fd.blockSignals(False)
         self.qslider_fdf.blockSignals(True)
-        self.qslider_fdf.setValue((100*np.log10(np.max((fdf, fmin)))))
+        self.qslider_fdf.setValue((int(100*np.log10(np.max((fdf, fmin))))))
         self.qslider_fdf.blockSignals(False)
         self.qslider_kp.blockSignals(True)
-        self.qslider_kp.setValue(np.max((10*kp, 10*gain_min)))
+        self.qslider_kp.setValue(int(np.max((10*kp, 10*gain_min))))
         self.qslider_kp.blockSignals(False)
 
         # Update the display:
@@ -508,19 +509,19 @@ class LoopFiltersUI(Qt.QWidget):
         # We block the signals from the sliders so we don't cause infinite recursion
 #        self.qslider_fi.setValue((100*np.log10(fi)))
         self.qslider_fi.blockSignals(True)
-        self.qslider_fi.setValue((100*np.log10(np.max((fi, fmin)))))
+        self.qslider_fi.setValue((int(100*np.log10(np.max((fi, fmin))))))
         self.qslider_fi.blockSignals(False)
         self.qslider_fii.blockSignals(True)
-        self.qslider_fii.setValue((100*np.log10(np.max((fii, fmin)))))
+        self.qslider_fii.setValue((int(100*np.log10(np.max((fii, fmin))))))
         self.qslider_fii.blockSignals(False)
         self.qslider_fd.blockSignals(True)
-        self.qslider_fd.setValue((100*np.log10(np.max((fd, fmin)))))
+        self.qslider_fd.setValue((int(100*np.log10(np.max((fd, fmin))))))
         self.qslider_fd.blockSignals(False)
         self.qslider_fdf.blockSignals(True)
-        self.qslider_fdf.setValue((100*np.log10(np.max((fdf, fmin)))))
+        self.qslider_fdf.setValue((int(100*np.log10(np.max((fdf, fmin))))))
         self.qslider_fdf.blockSignals(False)
         self.qslider_kp.blockSignals(True)
-        self.qslider_kp.setValue(np.max((10*kp, 10*gain_min)))
+        self.qslider_kp.setValue(int(np.max((10*kp, 10*gain_min))))
         self.qslider_kp.blockSignals(False)
 
         # Update the display:
@@ -623,12 +624,15 @@ class LoopFiltersUI(Qt.QWidget):
             fi = 1e-12
 
         if self.qchk_bKpCrossing.isChecked() == False:
-            if self.kp_min * self.kc == 0.0:
-                kp_min_dB = float('-inf')
+            if self.kp_min * self.kc <= 0.0:
+                kp_min_dB = -np.inf
             else:
                 kp_min_dB = 20*np.log10(self.kp_min * self.kc)
 
-            kp_max_dB = 20*np.log10(self.kp_max * self.kc)
+            if self.kp_max * self.kc <= 0.0:
+                kp_max_dB = np.inf
+            else:
+                kp_max_dB = 20*np.log10(self.kp_max * self.kc)
             fi_min = self.ki_min * self.kc / (2*np.pi/self.sl.dev.ADC_CLK_Hz)
             fi_max = self.ki_max * self.kc / (2*np.pi/self.sl.dev.ADC_CLK_Hz)
             fii_min = self.kii_min *self.kc / fi / (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
@@ -636,11 +640,14 @@ class LoopFiltersUI(Qt.QWidget):
             fd_min = self.kd_min * self.kc * fd * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
             fd_max = self.kd_max * self.kc * fd * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
         else:
-            if self.kp_min * self.kc == 0.0:
-                kp_min_dB = float('-inf')
+            if self.kp_min * self.kc <= 0:
+                kp_min_dB = - np.inf 
             else:
-                kp_min_dB = 20*np.log10(self.kp_min * self.kc)
-            kp_max_dB = 20*np.log10(self.kp_max * self.kc)
+                kp_min_dB = 20*np.log10(self.kp_min * self.kc)            
+            if self.kp_max * self.kc <= 0:
+                kp_max_dB = - np.inf
+            else:
+                kp_max_dB = 20*np.log10(self.kp_max * self.kc)
             fi_min = self.ki_min * self.kc/10**(kp/20) / (2*np.pi/self.sl.dev.ADC_CLK_Hz)
             fi_max = self.ki_max * self.kc/10**(kp/20) / (2*np.pi/self.sl.dev.ADC_CLK_Hz)
             fii_min = self.kii_min *self.kc/10**(kp/20) / fi / (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
@@ -814,19 +821,19 @@ class LoopFiltersUI(Qt.QWidget):
         gain_max = 100
 
         self.qslider_fi.blockSignals(True)
-        self.qslider_fi.setValue((100*np.log10(np.max((fi, fmin)))))
+        self.qslider_fi.setValue((int(100*np.log10(np.max((fi, fmin))))))
         self.qslider_fi.blockSignals(False)
         self.qslider_fii.blockSignals(True)
-        self.qslider_fii.setValue((100*np.log10(np.max((fii, fmin)))))
+        self.qslider_fii.setValue((int(100*np.log10(np.max((fii, fmin))))))
         self.qslider_fii.blockSignals(False)
         self.qslider_fd.blockSignals(True)
-        self.qslider_fd.setValue((100*np.log10(np.max((fd, fmin)))))
+        self.qslider_fd.setValue((int(100*np.log10(np.max((fd, fmin))))))
         self.qslider_fd.blockSignals(False)
         self.qslider_fdf.blockSignals(True)
-        self.qslider_fdf.setValue((100*np.log10(np.max((fdf, fmin)))))
+        self.qslider_fdf.setValue((int(100*np.log10(np.max((fdf, fmin))))))
         self.qslider_fdf.blockSignals(False)
         self.qslider_kp.blockSignals(True)
-        self.qslider_kp.setValue(np.max((10*kp, 10*gain_min)))
+        self.qslider_kp.setValue(int(np.max((10*kp, 10*gain_min))))
         self.qslider_kp.blockSignals(False)
 
         self.textboxChanged_withoutUpdateFPGA() # To update the sliders

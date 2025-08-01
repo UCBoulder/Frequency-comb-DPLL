@@ -6,7 +6,8 @@ Description: Provides a graphical user interface (GUI) to configure the RP
 @author: Alex Tourigny-Plante
 """
 
-from PyQt5 import QtGui, Qt, QtCore, QtWidgets
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import Qt
 #import PyQt4.Qwt5 as Qwt
 import numpy as np
 import weakref
@@ -20,7 +21,7 @@ from user_friendly_QLineEdit import user_friendly_QLineEdit
 from SuperLaserLand_JD_RP import SuperLaserLand_JD_RP
 
 
-class ConfigRPSettingsUI(Qt.QWidget):
+class ConfigRPSettingsUI(QtWidgets.QWidget):
     """docstring for ConfigRP"""
     def __init__(self, sl, sp, controller, custom_style_sheet='', custom_shorthand=''):
         super(ConfigRPSettingsUI, self).__init__()
@@ -149,24 +150,24 @@ class ConfigRPSettingsUI(Qt.QWidget):
 
     def initUI(self):
 
-        self.qgroupbox_MUX_vco = Qt.QGroupBox('Select connection to VCO')
+        self.qgroupbox_MUX_vco = QtWidgets.QGroupBox('Select connection to VCO')
         self.qgroupbox_MUX_vco.setAutoFillBackground(True)
-        MUX_vco = Qt.QGridLayout()
+        MUX_vco = QtWidgets.QGridLayout()
 
-        self.qradio_VCO_to_DAC0 = Qt.QRadioButton('VCO connected to DAC A')
-        self.qradio_VCO_to_DAC1 = Qt.QRadioButton('VCO connected to DAC B')
-        self.qradio_no_VCO = Qt.QRadioButton('No VCO connected')
+        self.qradio_VCO_to_DAC0 = QtWidgets.QRadioButton('VCO connected to DAC A')
+        self.qradio_VCO_to_DAC1 = QtWidgets.QRadioButton('VCO connected to DAC B')
+        self.qradio_no_VCO = QtWidgets.QRadioButton('No VCO connected')
         self.qradio_no_VCO.setChecked(True)
         self.qradio_VCO_to_DAC0.clicked.connect(self.mux_vco_Action)
         self.qradio_VCO_to_DAC1.clicked.connect(self.mux_vco_Action)
         self.qradio_no_VCO.clicked.connect(self.mux_vco_Action)
 
-        self.qlabel_int_vco_amplitude = Qt.QLabel('Internal VCO Amplitude [0-1]')
+        self.qlabel_int_vco_amplitude = QtWidgets.QLabel('Internal VCO Amplitude [0-1]')
         self.qedit_int_vco_amplitude = user_friendly_QLineEdit('0.5')
         self.qedit_int_vco_amplitude.returnPressed.connect(self.setInternalVCO_amplitude)
         self.qedit_int_vco_amplitude.setMaximumWidth(60)
 
-        self.qlabel_int_vco_offset = Qt.QLabel('Internal VCO offset [0-1]')
+        self.qlabel_int_vco_offset = QtWidgets.QLabel('Internal VCO offset [0-1]')
         self.qedit_int_vco_offset = user_friendly_QLineEdit('0.0')
         self.qedit_int_vco_offset.returnPressed.connect(self.setInternalVCO_offset)
         self.qedit_int_vco_offset.setMaximumWidth(60)
@@ -178,19 +179,19 @@ class ConfigRPSettingsUI(Qt.QWidget):
         MUX_vco.addWidget(self.qedit_int_vco_offset, 1,2)
         MUX_vco.addWidget(self.qlabel_int_vco_amplitude, 2,1)
         MUX_vco.addWidget(self.qedit_int_vco_amplitude, 2,2)
-        MUX_vco.addItem(Qt.QSpacerItem(0, 0, Qt.QSizePolicy.MinimumExpanding, Qt.QSizePolicy.Minimum), 2, 0)
+        MUX_vco.addItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum), 2, 0)
         MUX_vco.setRowStretch(2, 2)
 
         self.qgroupbox_MUX_vco.setLayout(MUX_vco)
 
         ###################################################################################
-        self.qgroupbox_MUX_pll1 = Qt.QGroupBox('Select connection to PLL 1')
+        self.qgroupbox_MUX_pll1 = QtWidgets.QGroupBox('Select connection to PLL 1')
         self.qgroupbox_MUX_pll1.setAutoFillBackground(True)
-        MUX_pll1 = Qt.QGridLayout()
+        MUX_pll1 = QtWidgets.QGridLayout()
 
-        self.qradio_ddc0_to_pll1 = Qt.QRadioButton('DDC_0 output to PLL_1 input')
-        self.qradio_pll0_to_pll1 = Qt.QRadioButton('PLL_0 output to PLL_1 input')
-        self.qradio_ddc1_to_pll1 = Qt.QRadioButton('DDC_1 output to PLL_1 input')
+        self.qradio_ddc0_to_pll1 = QtWidgets.QRadioButton('DDC_0 output to PLL_1 input')
+        self.qradio_pll0_to_pll1 = QtWidgets.QRadioButton('PLL_0 output to PLL_1 input')
+        self.qradio_ddc1_to_pll1 = QtWidgets.QRadioButton('DDC_1 output to PLL_1 input')
         self.qradio_ddc1_to_pll1.setChecked(True)
         self.qradio_pll0_to_pll1.clicked.connect(self.mux_pll1_Action)
         self.qradio_ddc0_to_pll1.clicked.connect(self.mux_pll1_Action)
@@ -205,15 +206,15 @@ class ConfigRPSettingsUI(Qt.QWidget):
 
 
         ###################################################################################
-        self.qgroupbox_read_data = Qt.QGroupBox('Read data from dpll (channel 2)')
+        self.qgroupbox_read_data = QtWidgets.QGroupBox('Read data from dpll (channel 2)')
         self.qgroupbox_read_data.setAutoFillBackground(True)
-        read_data = Qt.QGridLayout()
+        read_data = QtWidgets.QGridLayout()
 
-        self.qlabel_addr = Qt.QLabel('Address: 0x')
+        self.qlabel_addr = QtWidgets.QLabel('Address: 0x')
         self.qedit_addr = user_friendly_QLineEdit('9000')
         self.qedit_addr.setMaximumWidth(100)
 
-        self.qlabel_data = Qt.QLabel('Data:')
+        self.qlabel_data = QtWidgets.QLabel('Data:')
         self.qedit_data = user_friendly_QLineEdit('0')
         self.qedit_data.setMaximumWidth(300)
 
@@ -233,12 +234,12 @@ class ConfigRPSettingsUI(Qt.QWidget):
 
         ###################################################################################
 
-        self.qgroupbox_fanUI = Qt.QGroupBox('Turn on/off fan')
+        self.qgroupbox_fanUI = QtWidgets.QGroupBox('Turn on/off fan')
         self.qgroupbox_fanUI.setAutoFillBackground(True)
-        fanUI = Qt.QGridLayout()
+        fanUI = QtWidgets.QGridLayout()
 
-        self.qradio_fan_on  = Qt.QRadioButton('Fan on')
-        self.qradio_fan_off = Qt.QRadioButton('Fan off')
+        self.qradio_fan_on  = QtWidgets.QRadioButton('Fan on')
+        self.qradio_fan_off = QtWidgets.QRadioButton('Fan off')
         self.qradio_fan_on.setChecked(True)
         self.qradio_fan_on.clicked.connect(self.setFan)
         self.qradio_fan_off.clicked.connect(self.setFan)
@@ -258,9 +259,9 @@ class ConfigRPSettingsUI(Qt.QWidget):
 
         ###################################################################################
 
-        self.group = Qt.QGroupBox('RP configuration')
+        self.group = QtWidgets.QGroupBox('RP configuration')
         self.group.setAutoFillBackground(True)
-        group = Qt.QGridLayout()
+        group = QtWidgets.QGridLayout()
 
         group.addWidget(self.qgroupbox_MUX_vco, 0, 0, 2, 4)
         group.addWidget(self.qgroupbox_MUX_pll1, 3, 0, 2, 4)
@@ -272,7 +273,7 @@ class ConfigRPSettingsUI(Qt.QWidget):
         #vbox.addStretch(1)
         self.group.setLayout(group)
 
-        grid = Qt.QGridLayout()
+        grid = QtWidgets.QGridLayout()
         grid.addWidget(self.group)
         self.setLayout(grid)
 

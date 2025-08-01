@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, Qt, QtGui, uic
+from PyQt5 import QtCore, QtGui, QtWidgets, uic
 import sys
 import time
 
@@ -8,7 +8,7 @@ import pyqtgraph as pg
 import math
 
 
-class DataLoggingDisplayWidget(QtGui.QWidget):
+class DataLoggingDisplayWidget(QtWidgets.QWidget):
     def __init__(self, parent=None, numPlots=1, numCurvesPerPlot=1):
         super(DataLoggingDisplayWidget, self).__init__(parent)
 
@@ -188,7 +188,7 @@ class DataLoggingDisplayWidget(QtGui.QWidget):
 
 
 def main():
-    app = QtGui.QApplication([])
+    app = QtWidgets.QApplication([])
     GUI = DataLoggingDisplayWidget(numPlots=2, numCurvesPerPlot=3)
     GUI.pltItemsList[0].setToolTip('Blue = First curve, Orange = Second curve')
     GUI.pltItemsList[1].setToolTip('Blue = First curve, Orange = Second curve')
@@ -200,7 +200,7 @@ def main():
         
     # Execute application unless we are running in interactive mode (got this trick from PyQtGraph examples)
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-        QtGui.QApplication.instance().exec_()
+        QtWidgets.QApplication.instance().exec_()
 
     # del GUI
     # time.sleep(5)

@@ -7,7 +7,7 @@ Created on Mon Apr 14 11:46:04 2014
 from __future__ import print_function
 
 import time
-from PyQt5 import QtGui, Qt
+from PyQt5 import QtGui, QtWidgets
 import numpy as np
 import sys
 
@@ -53,7 +53,7 @@ pg.setConfigOption('foreground', 'k')
 
 ##########################
 # Create the PyQtGraph window for plotting:
-win = pg.GraphicsWindow()
+win = pg.GraphicsLayoutWidget(show=True)
 win.resize(1000,600)
 win.setWindowTitle('Log viewer: %s' % strTemplate)
 
@@ -69,7 +69,7 @@ infosDictionary = {'DAC0': ('DAC0', 0, (0, 0, 255)),
 windowsDictionary = {}
 plotsTitles = ['Normalized DAC outputs', 'Frequency error']
 plot_list = []
-for strName, tuple_item in infosDictionary.iteritems():
+for strName, tuple_item in infosDictionary.items():
     # Get information out of our dictionary:
     strCurrentPostfix = tuple_item[0]
     window_number = tuple_item[1]

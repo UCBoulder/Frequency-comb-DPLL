@@ -10,7 +10,7 @@
 import sys
 
 
-from PyQt5 import QtGui, Qt, QtCore, QtWidgets
+from PyQt5 import QtGui, QtCore, QtWidgets
 #from PyQt5 import QtGui, Qt
 #import PyQt5.Qwt5 as Qwt
 import numpy as np
@@ -72,8 +72,8 @@ class ThermometerWidget(QtWidgets.QWidget):
         self.resizeEvent(None)
 
     def setFillColor(self, color):
-        PaletteBackground = Qt.QPalette()
-        PaletteBackground.setColor(Qt.QPalette.Background, color)
+        PaletteBackground = QtGui.QPalette()
+        PaletteBackground.setColor(QtGui.QPalette.Background, color)
         self.front_label.setPalette(PaletteBackground)
         self.front_label.setAutoFillBackground(True)
 
@@ -85,8 +85,8 @@ class ThermometerWidget(QtWidgets.QWidget):
 
         
         # we need a black background to create the lines
-        PaletteBlack = Qt.QPalette()
-        PaletteBlack.setColor(Qt.QPalette.Background, Qt.Qt.black)
+        PaletteBlack = QtGui.QPalette()
+        PaletteBlack.setColor(QtGui.QPalette.Background, QtCore.Qt.black)
 
 
         # create one line and one label per major tick mark:
@@ -101,9 +101,9 @@ class ThermometerWidget(QtWidgets.QWidget):
             self.ticksValuesList.append(elem)
             self.ticksTextList.append(ticksTextList[index])
 
-            self.lblTicks.append(Qt.QLabel(ticksTextList[index], self))
+            self.lblTicks.append(QtWidgets.QLabel(ticksTextList[index], self))
             #self.qline_ticks.append(QtCore.Qline(self))
-            self.qline_ticks.append(Qt.QLabel(self))
+            self.qline_ticks.append(QtWidgets.QLabel(self))
             self.qline_ticks[-1].setPalette(PaletteBlack)
             self.qline_ticks[-1].setAutoFillBackground(True)
             # measure the widest tick label to size overall widget:
@@ -117,7 +117,7 @@ class ThermometerWidget(QtWidgets.QWidget):
         self.qline_minor_ticks = list()
         for index, elem in enumerate(minorTicksValuesList):
             self.minorTicksValuesList.append(elem)
-            self.qline_minor_ticks.append(Qt.QLabel(self))
+            self.qline_minor_ticks.append(QtWidgets.QLabel(self))
             self.qline_minor_ticks[-1].setPalette(PaletteBlack)
             self.qline_minor_ticks[-1].setAutoFillBackground(True)
 
@@ -182,8 +182,8 @@ class ThermometerWidget(QtWidgets.QWidget):
 
 
     def initUI(self):
-        self.bck_label = Qt.QLabel(self)
-        self.front_label = Qt.QLabel(self)
+        self.bck_label = QtWidgets.QLabel(self)
+        self.front_label = QtWidgets.QLabel(self)
 
         # add border to back label:
         self.bck_label.setStyleSheet('border: %dpx solid black' % self.border_width)
@@ -199,10 +199,10 @@ class ThermometerWidget(QtWidgets.QWidget):
 
 
         # back label should be minimum, front label should be fixed (and follow )
-        self.bck_label.setSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.Minimum)
-        self.front_label.setSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.Ignored)
+        self.bck_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
+        self.front_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Ignored)
         self.setFixedWidth(self.bar_width+2*self.border_width)
-        self.setSizePolicy(Qt.QSizePolicy.Fixed, Qt.QSizePolicy.Minimum)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
 
 
 if __name__ == '__main__':
@@ -213,7 +213,7 @@ if __name__ == '__main__':
         app = QtWidgets.QApplication(sys.argv)
     
     ex = ThermometerWidget()
-    ex.setFillColor(Qt.Qt.blue)
+    ex.setFillColor(QtCore.Qt.blue)
     ex.setValue(0.2)
     ticksListMajor = [0, 0.2, 0.4, 0.6, 0.8, 1]
     ticksListMinor = [0.1, 0.3, 0.5, 0.7, 0.9]

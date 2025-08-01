@@ -6,7 +6,7 @@ Description: Provides a graphical user interface (GUI) for setting the loop filt
 @author: JD Deschenes
 """
 from __future__ import print_function
-from PyQt5 import QtGui, Qt, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 import numpy as np
 import weakref
 
@@ -15,7 +15,7 @@ import time
 
 from LoopFiltersUI import LoopFiltersUI
 
-class LoopFiltersUI_DAC1_and_DAC2(Qt.QWidget):
+class LoopFiltersUI_DAC1_and_DAC2(QtWidgets.QWidget):
     
     MINIMUM_GAIN_DISPLAY = 10**(-120/20)
     kc = 1
@@ -268,17 +268,17 @@ class LoopFiltersUI_DAC1_and_DAC2(Qt.QWidget):
     def initUI(self):
 #        print('initUI()')
         
-        self.qchk_lock = Qt.QCheckBox('Lock On') # Not displayed, for status reading only (to act like the other LoopFilter)
+        self.qchk_lock = QtWidgets.QCheckBox('Lock On') # Not displayed, for status reading only (to act like the other LoopFilter)
         self.qchk_lock.setChecked(False)
 
         # first column: contains the radio buttons to select the mode
-        vbox = Qt.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         
-        self.qradio_mode_off = Qt.QRadioButton('Off')
+        self.qradio_mode_off = QtWidgets.QRadioButton('Off')
         self.qradio_mode_off.setChecked(True)
-        self.qradio_mode_slow = Qt.QRadioButton('Acquisition on slow PZT only')
-        self.qradio_mode_fast = Qt.QRadioButton('Lock on fast PZT only')
-        self.qradio_mode_both = Qt.QRadioButton('Lock on both PZTs')
+        self.qradio_mode_slow = QtWidgets.QRadioButton('Acquisition on slow PZT only')
+        self.qradio_mode_fast = QtWidgets.QRadioButton('Lock on fast PZT only')
+        self.qradio_mode_both = QtWidgets.QRadioButton('Lock on both PZTs')
         
 #        self.qradio_mode_off.setEnabled(self.bDisplayLockChkBox)
 #        self.qradio_mode_slow.setEnabled(self.bDisplayLockChkBox)
@@ -286,9 +286,9 @@ class LoopFiltersUI_DAC1_and_DAC2(Qt.QWidget):
 #        self.qradio_mode_both.setEnabled(self.bDisplayLockChkBox)
         
         # Two checkboxes to flip the sign
-        self.qchk_flip1 = Qt.QCheckBox('Flip sign on acquisition')
+        self.qchk_flip1 = QtWidgets.QCheckBox('Flip sign on acquisition')
         self.qchk_flip1.clicked.connect(self.setIntegratorGainEvent)
-        self.qchk_flip2 = Qt.QCheckBox('Flip sign on lock')
+        self.qchk_flip2 = QtWidgets.QCheckBox('Flip sign on lock')
         self.qchk_flip2.clicked.connect(self.setIntegratorGainEvent)
         
         
@@ -297,17 +297,17 @@ class LoopFiltersUI_DAC1_and_DAC2(Qt.QWidget):
         self.qradio_mode_fast.clicked.connect(self.updateSettings)
         self.qradio_mode_both.clicked.connect(self.updateSettings)
         
-        self.qgroup_mode = Qt.QButtonGroup(self)
+        self.qgroup_mode = QtWidgets.QButtonGroup(self)
         self.qgroup_mode.addButton(self.qradio_mode_off)
         self.qgroup_mode.addButton(self.qradio_mode_slow)
         self.qgroup_mode.addButton(self.qradio_mode_fast)
         self.qgroup_mode.addButton(self.qradio_mode_both)
         
-        self.qchk_hold = Qt.QCheckBox('Hold both')
+        self.qchk_hold = QtWidgets.QCheckBox('Hold both')
         self.qchk_hold.clicked.connect(self.updateSettings)
         
-        self.qlabel_int1_state = Qt.QLabel('Integrator 1 state: Off')
-        self.qlabel_int2_state = Qt.QLabel('Integrator 2 state: Off')
+        self.qlabel_int1_state = QtWidgets.QLabel('Integrator 1 state: Off')
+        self.qlabel_int2_state = QtWidgets.QLabel('Integrator 2 state: Off')
         
         vbox.addWidget(self.qradio_mode_off)
         vbox.addWidget(self.qradio_mode_slow)
@@ -324,33 +324,33 @@ class LoopFiltersUI_DAC1_and_DAC2(Qt.QWidget):
         
         ## The slow PZT integrators BW controls:
         # The label to indicate the predicted closed-loop BW
-        self.qlbl_acquisition = Qt.QLabel('Acq gain:')
-        self.qlabel_int1_gain = Qt.QLabel('BW : 10 Hz')
-        self.qlabel_int1_gain.setAlignment(Qt.Qt.AlignHCenter)
+        self.qlbl_acquisition = QtWidgets.QLabel('Acq gain:')
+        self.qlabel_int1_gain = QtWidgets.QLabel('BW : 10 Hz')
+        self.qlabel_int1_gain.setAlignment(QtCore.Qt.AlignHCenter)
         
         # The knob to set the open-loop gain, and thus closed-loop BW
-        self.qcombo_int1_gain = Qt.QComboBox()
+        self.qcombo_int1_gain = QtWidgets.QComboBox()
         gainsList = range(-31, 31)
         gainsList = list(map(str, gainsList))
         self.qcombo_int1_gain.addItems(gainsList)
         self.qcombo_int1_gain.setCurrentIndex(32-17)    # this has to be overridden if we load the register settings (TODO)
         self.qcombo_int1_gain.currentIndexChanged.connect(self.setIntegratorGainEvent)
         
-        self.qlbl_lock_gain = Qt.QLabel('Lock gain:')
-        self.qlabel_int2_gain = Qt.QLabel('BW : 1 kHz')
-        self.qlabel_int2_gain.setAlignment(Qt.Qt.AlignHCenter)
+        self.qlbl_lock_gain = QtWidgets.QLabel('Lock gain:')
+        self.qlabel_int2_gain = QtWidgets.QLabel('BW : 1 kHz')
+        self.qlabel_int2_gain.setAlignment(QtCore.Qt.AlignHCenter)
         
         # The knob to set the open-loop gain, and thus closed-loop BW
-        self.qcombo_int2_gain = Qt.QComboBox()
+        self.qcombo_int2_gain = QtWidgets.QComboBox()
         gainsList = range(-31, 31)
         gainsList = list(map(str, gainsList))
         self.qcombo_int2_gain.addItems(gainsList)
         self.qcombo_int2_gain.setCurrentIndex(32-17)    # this has to be overridden if we load the register settings (TODO)
         self.qcombo_int2_gain.currentIndexChanged.connect(self.setIntegratorGainEvent)
         
-        self.qgroupbox_integrators = Qt.QGroupBox('Slow PZT (DAC2)')
+        self.qgroupbox_integrators = QtWidgets.QGroupBox('Slow PZT (DAC2)')
         
-        vbox_int = Qt.QVBoxLayout()
+        vbox_int = QtWidgets.QVBoxLayout()
         vbox_int.addWidget(self.qlbl_acquisition)
         vbox_int.addWidget(self.qcombo_int1_gain)
         vbox_int.addWidget(self.qlabel_int1_gain)
@@ -362,14 +362,14 @@ class LoopFiltersUI_DAC1_and_DAC2(Qt.QWidget):
         self.qgroupbox_integrators.setLayout(vbox_int)
         
         # The controls for the fast PZT's loop filter settings, contains only one (composite) widget:
-        self.qgroupbox_pll = Qt.QGroupBox('Fast PZT (DAC1)', self)
+        self.qgroupbox_pll = QtWidgets.QGroupBox('Fast PZT (DAC1)', self)
 #        self.dac1_ui.setParent(self.qgroupbox_pll)
-        vbox3 = Qt.QVBoxLayout()
+        vbox3 = QtWidgets.QVBoxLayout()
         vbox3.addWidget(self.dac1_ui)
         self.qgroupbox_pll.setLayout(vbox3)
         
         # Put all the vboxes and groupboxes into a single layout:
-        hbox = Qt.QHBoxLayout()
+        hbox = QtWidgets.QHBoxLayout()
         hbox.addLayout(vbox)
         hbox.addWidget(self.qgroupbox_integrators)
         hbox.addWidget(self.qgroupbox_pll)
