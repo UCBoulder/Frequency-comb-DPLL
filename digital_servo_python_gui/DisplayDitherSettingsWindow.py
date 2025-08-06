@@ -3,15 +3,14 @@ XEM6010 Phase-lock box GUI, Dither settings controls
 by JD Deschenes, October 2013
 
 """
-from __future__ import print_function
+from __future__ import print_function, annotations
 
-import time
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtWidgets
 import numpy as np
-
 import weakref
-#from SuperLaserLand_JD2 import SuperLaserLand_JD2
-#from DisplayTransferFunctionWindow import DisplayTransferFunctionWindow
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from SuperLaserLand_JD_RP import SuperLaserLand_JD_RP
 
 
 class DisplayDitherSettingsWindow(QtWidgets.QWidget):
@@ -22,7 +21,7 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
 
 
         self.output_number = output_number
-        self.sl = weakref.proxy(sl)
+        self.sl:SuperLaserLand_JD_RP = weakref.proxy(sl)
         self.sp = sp
         self.setObjectName('MainWindow')
         self.setStyleSheet(custom_style_sheet)

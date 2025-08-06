@@ -11,6 +11,7 @@ from PyQt5.QtCore import Qt
 #import PyQt5.Qwt5 as Qwt
 import numpy as np
 import weakref
+from SuperLaserLand_JD_RP import SuperLaserLand_JD_RP
 
 import traceback
 
@@ -23,12 +24,12 @@ class LoopFiltersUI(QtWidgets.QWidget):
 
     MINIMUM_GAIN_DISPLAY = 10**(-120/20)
 
-    def __init__(self, sl, filter_number=0, bDisplayLockChkBox=True):
+    def __init__(self, sl: SuperLaserLand_JD_RP, filter_number=0, bDisplayLockChkBox=True):
         super(LoopFiltersUI, self).__init__()
 #        print('LoopFiltersUI::__init__(): Entering')
 
         # We need sl here because we need to pass it to the pll object, and we need ADC_CLK_Hz to set the correct loop filter gain, because the integrators transfer function depends on that ADC_CLK_Hz
-        self.sl = weakref.proxy(sl)
+        self.sl: SuperLaserLand_JD_RP = weakref.proxy(sl)
         self.filter_number = filter_number
         # All the gains here are normalized to the DC, open-loop gain of the overall system:
         self.kc = 1
@@ -385,7 +386,6 @@ class LoopFiltersUI(QtWidgets.QWidget):
 
         gain_min = -30
         gain_max = 100
-
         return (kp, fi, fii, fd, fdf, fmin, fmax, gain_min, gain_max, bLock)
 
     def kpSliderEvent(self):
@@ -670,6 +670,7 @@ class LoopFiltersUI(QtWidgets.QWidget):
             # I is relative to 1/kc
             # all the values here are relative to the open-loop DC gain of the system, self.kc:
             P_gain = 10**(kp/20)/self.kc
+
             I_gain = 1/self.kc * fi * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
             II_gain = 1/self.kc * fi * fii * (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
             if fd == 0.0:

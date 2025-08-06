@@ -28,6 +28,7 @@ import weakref
 # stuff for Python 3 port
 import pyqtgraph as pg
 import SuperLaserLand_JD_RP
+from XEM_GUI_MainWindow import XEM_GUI_MainWindow
 
 # for snr log
 import struct
@@ -48,7 +49,7 @@ class FreqErrorWindowWithTempControlV2(QtWidgets.QWidget):
 
         # Need to pass xem_gui_window as a parameter (to control DAC offset)
         if xem_gui_mainwindow:
-            self.xem_gui_mainwindow = weakref.proxy(xem_gui_mainwindow)
+            self.xem_gui_mainwindow: XEM_GUI_MainWindow = weakref.proxy(xem_gui_mainwindow)
         else:
             self.xem_gui_mainwindow = None
 
@@ -168,8 +169,6 @@ class FreqErrorWindowWithTempControlV2(QtWidgets.QWidget):
         self.bVeryFirst = True
 
     def openOutputFiles(self):
-
-
         # Create the subdirectory if it doesn't exist:
         os.makedirs('data_logging', exist_ok=True)
 
@@ -381,8 +380,7 @@ class FreqErrorWindowWithTempControlV2(QtWidgets.QWidget):
         else:
             self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + QtCore.QPoint(985, 10+450+80))
 
-    def timerEvent(self, e):
-
+    def timerEvent(self, a0):
 #        print('timerEvent, timerID = %d' % self.timerID)
         self.qchk_triangular.blockSignals(True)
         self.qchk_triangular.setChecked(self.sl.bTriangularAveraging)
@@ -635,9 +633,9 @@ class FreqErrorWindowWithTempControlV2(QtWidgets.QWidget):
 
                 channelName = ''
                 if self.output_number == 0:
-                    channelName = 'CEO'
+                    channelName = 'Fast'
                 if self.output_number == 1:
-                    channelName = 'Optical'
+                    channelName = 'Slow'
 
                 # Update graph:
                 self.curve_freq_error.setData(self.time_history_counters[self.bValid_counters] - self.time_history_counters[len(self.time_history_counters)-1], self.freq_history[self.bValid_counters])

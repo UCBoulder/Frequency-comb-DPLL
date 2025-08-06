@@ -6,24 +6,17 @@ Description: Provides a graphical user interface (GUI) to configure the RP
 @author: Alex Tourigny-Plante
 """
 
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt
-#import PyQt4.Qwt5 as Qwt
+from PyQt5 import QtWidgets
 import numpy as np
 import weakref
-import sys
-
-import traceback
 
 from user_friendly_QLineEdit import user_friendly_QLineEdit
-
-
 from SuperLaserLand_JD_RP import SuperLaserLand_JD_RP
-
+from SLLSystemParameters import SLLSystemParameters
 
 class ConfigRPSettingsUI(QtWidgets.QWidget):
     """docstring for ConfigRP"""
-    def __init__(self, sl, sp, controller, custom_style_sheet='', custom_shorthand=''):
+    def __init__(self, sl:SuperLaserLand_JD_RP, sp: SLLSystemParameters, controller, custom_style_sheet='', custom_shorthand=''):
         super(ConfigRPSettingsUI, self).__init__()
         print('ConfigRPSettingsUI::__init(): Entering')
         self.sl = weakref.proxy(sl)
@@ -363,18 +356,18 @@ class ConfigRPSettingsUI(QtWidgets.QWidget):
 
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
-    #app = QApplication(sys.argv)
-    app = QtCore.QCoreApplication.instance()
-    if app is None:
-        app = QtWidgets.QApplication(sys.argv)
+#     #app = QApplication(sys.argv)
+#     app = QtCore.QCoreApplication.instance()
+#     if app is None:
+#         app = QtWidgets.QApplication(sys.argv)
 
-    sl = SuperLaserLand_JD_RP()
-    w = ConfigRPSettingsUI(sl)
-    w.show()
-    w.resize(800, 300)
+#     sl = SuperLaserLand_JD_RP()
+#     w = ConfigRPSettingsUI(sl)
+#     w.show()
+#     w.resize(800, 300)
 
 
-    app.exec_()
+#     app.exec_()
 

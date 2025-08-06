@@ -16,7 +16,6 @@ import time
 
 from RP_PLL import RP_PLL_device # needed to update FPGA firmware and CPU (Zynq) software
 import socket
-
 class initialConfiguration(QtWidgets.QDialog):
 
 
@@ -284,6 +283,7 @@ class initialConfiguration(QtWidgets.QDialog):
             self.strSelectedIP = str(self.qedit_manual_entry.text())
             # TODO read name and MAC address
             self.strSelectedName = self.strSelectedIP
+            print(self.strSelectedName)
 
     def okClicked(self):
         self.bOk = True

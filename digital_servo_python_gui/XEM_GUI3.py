@@ -7,11 +7,9 @@ by JD Deschenes, October 2013
 
 """
 from __future__ import print_function
+import time
 import sys
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import Qt
-
-import numpy as np
+from PyQt5 import QtCore, QtWidgets
 
 
 from SuperLaserLand_JD_RP import SuperLaserLand_JD_RP
@@ -19,33 +17,23 @@ from XEM_GUI_MainWindow import XEM_GUI_MainWindow
 from FreqErrorWindowWithTempControlV2 import FreqErrorWindowWithTempControlV2
 from initialConfiguration_RP import initialConfiguration
 from SLLSystemParameters import SLLSystemParameters
-
 from DisplayDitherSettingsWindow import DisplayDitherSettingsWindow
-
 from DisplayDividerAndResidualsStreamingSettingsWindow import DisplayDividerAndResidualsStreamingSettingsWindow
-
 from ConfigurationRPSettingsUI import ConfigRPSettingsUI
-
 from devicesData import devicesData
 
-import time
-
-
-
-class controller(object):
+class Controller:
     """Main class of the GUI. It contains most of the elements of the GUI, the main_window and the communication class"""
     def __init__(self):
         # Create the object that handles the communication with the FPGA board:
         self.sl = SuperLaserLand_JD_RP(controller = self)
         self.updateDeviceData()
-
         self.sp = SLLSystemParameters(self.sl)
 
         # Start Qt:
         self.app = QtCore.QCoreApplication.instance()
         if self.app is None:
             self.app = QtWidgets.QApplication(sys.argv)
-
 
         self.main()
 
@@ -572,5 +560,5 @@ class controller(object):
 
 
 if __name__ == '__main__':
-    controller()
+    Controller()
 

@@ -335,7 +335,7 @@ def test2():
     mock_server = objSocketMock()
     time.sleep(0.1)
 
-    controller = XEM_GUI3.controller(bManualStartupForTests=True)
+    controller = XEM_GUI3.Controller(bManualStartupForTests=True)
 
     def timerConnectAfterEventLoopIsRunning():
         controller.pushDefaultValues(strSelectedSerial = "000000000000", ip_addr = "127.0.0.1", port=5000)

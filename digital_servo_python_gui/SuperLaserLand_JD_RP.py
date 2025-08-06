@@ -74,7 +74,7 @@ class SuperLaserLand_JD_RP:
         self.output_vco = [0, 0, 0]
 
         # Triangular averaging is on by default:
-        self.bTriangularAveraging = 1
+        self.bTriangularAveraging = True
 
         # variables for the dither lock-in:
         self.modulation_period_divided_by_4_minus_one = [0, 0, 0]
@@ -514,7 +514,7 @@ class SuperLaserLand_JD_RP:
             print('ditherRead')
 
         # Read N samples from the dither lock-in
-        samples = np.zeros(N_samples, dtype=np.complexfloating)
+        samples = np.zeros(N_samples, dtype=complex)
 
         if dac_number == 0:
             BASE_ADDR_REAL_LSB = self.dev.BUS_ADDR_DITHER0_LOCKIN_REAL_LSB
@@ -888,7 +888,7 @@ class SuperLaserLand_JD_RP:
     # Read/Write Frequency Counter Parameters:
     #
 
-    def setCounterMode(self, bTriangular: int):
+    def setCounterMode(self, bTriangular: bool):
         assert isinstance(bTriangular, int)
         if self.bVerbose == True:
             print('setCounterMode')
@@ -901,8 +901,8 @@ class SuperLaserLand_JD_RP:
     def getCounterMode(self):
         if self.bVerbose == True:
             print('getCounterMode')
-        self.bTriangularAveraging = self.dev.read_Zynq_register_uint16(
-                self.dev.dpll_read_address(self.dev.BUS_ADDR_triangular_averaging))
+        self.bTriangularAveraging = bool(self.dev.read_Zynq_register_uint16(
+                self.dev.dpll_read_address(self.dev.BUS_ADDR_triangular_averaging)))
         return self.bTriangularAveraging
 
     def read_dual_mode_counter(self, output_number):

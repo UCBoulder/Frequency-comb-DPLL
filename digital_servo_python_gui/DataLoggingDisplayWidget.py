@@ -1,10 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 import sys
 import time
-
 import numpy as np
 import pyqtgraph as pg
-
 import math
 
 

@@ -6,17 +6,15 @@ by JD Deschenes, October 2013
 from __future__ import print_function
 
 import time
-from PyQt5 import QtGui, Qt, QtWidgets
-import numpy as np
-
+from PyQt5 import QtWidgets
 import weakref
-#from SuperLaserLand_JD2 import SuperLaserLand_JD2
-#from DisplayTransferFunctionWindow import DisplayTransferFunctionWindow
+
+from SuperLaserLand_JD_RP import SuperLaserLand_JD_RP
 
 
 class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
 
-    def __init__(self, sl, sp, clk_divider_modulus=67e3, bDividerOn=0, bPulses=0, custom_style_sheet='', custom_shorthand=''):
+    def __init__(self, sl: SuperLaserLand_JD_RP, sp, clk_divider_modulus=67e3, bDividerOn=0, bPulses=0, custom_style_sheet='', custom_shorthand=''):
         super(DisplayDividerAndResidualsStreamingSettingsWindow, self).__init__()
 
         self.clk_divider_modulus = clk_divider_modulus
@@ -24,7 +22,7 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.bPulses = bPulses
 
         self.sp = sp
-        self.sl = weakref.proxy(sl)
+        self.sl: SuperLaserLand_JD_RP = weakref.proxy(sl)
         self.setObjectName('MainWindow')
         self.setStyleSheet(custom_style_sheet)
         self.custom_shorthand = custom_shorthand
@@ -330,7 +328,7 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         # Create the widgets which control the clk divider module:
         # Needs: clk_divider_modulus, bDividerOn, bPulses or Square Wave
         ######################################################################
-        self.qgroupbox_divider = Qt.QGroupBox('Clk divider settings (Triggers the PRBS generator on DOUT2), enter to accept changes')
+        self.qgroupbox_divider = QtWidgets.QGroupBox('Clk divider settings (Triggers the PRBS generator on DOUT2), enter to accept changes')
         self.qgroupbox_divider.setAutoFillBackground(True)
 
         if self.bPulses:
@@ -340,25 +338,25 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
             output_freq = 2*self.sl.dev.ADC_CLK_Hz/(2*(self.clk_divider_modulus))
 
 
-        self.qlbl_modulus = Qt.QLabel('Modulus [2, 2^32-1], [samples at 200 MHz]:')
-        self.qedit_modulus = Qt.QLineEdit(str(int(self.clk_divider_modulus+1)))
+        self.qlbl_modulus = QtWidgets.QLabel('Modulus [2, 2^32-1], [samples at 200 MHz]:')
+        self.qedit_modulus = QtWidgets.QLineEdit(str(int(self.clk_divider_modulus+1)))
         self.qedit_modulus.editingFinished.connect(self.updateClicked)
 
-        self.qlbl_phaseinc = Qt.QLabel('Time increment [-Period, Period], [seconds]:')
-        self.qedit_phaseinc = Qt.QLineEdit('0')
+        self.qlbl_phaseinc = QtWidgets.QLabel('Time increment [-Period, Period], [seconds]:')
+        self.qedit_phaseinc = QtWidgets.QLineEdit('0')
 #        self.qedit_phaseinc.editingFinished.connect(self.phaseIncrement)
-        self.qbtn_phaseinc = Qt.QPushButton('Apply')
+        self.qbtn_phaseinc = QtWidgets.QPushButton('Apply')
         self.qbtn_phaseinc.clicked.connect(self.phaseIncrement)
 
         # Modulation frequency:
-        self.qlbl_freq = Qt.QLabel('Actual frequency [Hz]:')
-        self.qlbl_actual_frequency = Qt.QLabel(str(output_freq))
+        self.qlbl_freq = QtWidgets.QLabel('Actual frequency [Hz]:')
+        self.qlbl_actual_frequency = QtWidgets.QLabel(str(output_freq))
 #        self.qlbl_actual_frequency.setMaximumWidth(60)
 
         # Sine/Square wave
-        self.qradio_pulses = Qt.QRadioButton('5 ns pulses')
-        self.qradio_square_wave = Qt.QRadioButton('Square wave')
-        self.qsign_group = Qt.QButtonGroup(self)
+        self.qradio_pulses = QtWidgets.QRadioButton('5 ns pulses')
+        self.qradio_square_wave = QtWidgets.QRadioButton('Square wave')
+        self.qsign_group = QtWidgets.QButtonGroup(self)
         self.qsign_group.addButton(self.qradio_pulses)
         self.qsign_group.addButton(self.qradio_square_wave)
 
@@ -399,7 +397,7 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         # Create the widgets which control the residuals streaming module:
         # Needs: data_delay, trigger_delay, boxcar_filter_size
         ######################################################################
-        self.qgroupbox_streaming = Qt.QGroupBox('Residuals streaming settings')
+        self.qgroupbox_streaming = QtWidgets.QGroupBox('Residuals streaming settings')
         self.qgroupbox_streaming.setAutoFillBackground(True)
 
         if self.bPulses:
@@ -409,26 +407,26 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
             output_freq = 2*self.sl.dev.ADC_CLK_Hz/(2*(self.clk_divider_modulus))
 
 
-        self.qlbl_data_delay = Qt.QLabel('Data delay, [samples at 100 MHz]:')
-        self.qedit_data_delay = Qt.QLineEdit('1')
+        self.qlbl_data_delay = QtWidgets.QLabel('Data delay, [samples at 100 MHz]:')
+        self.qedit_data_delay = QtWidgets.QLineEdit('1')
         self.qedit_data_delay.textChanged.connect(self.residualsClicked)
         self.qedit_data_delay.setMaximumWidth(60)
 
-        self.qlbl_trigger_delay = Qt.QLabel('Trigger delay, [samples at 100 MHz]:')
-        self.qedit_trigger_delay = Qt.QLineEdit('1')
+        self.qlbl_trigger_delay = QtWidgets.QLabel('Trigger delay, [samples at 100 MHz]:')
+        self.qedit_trigger_delay = QtWidgets.QLineEdit('1')
         self.qedit_trigger_delay.textChanged.connect(self.residualsClicked)
         self.qedit_trigger_delay.setMaximumWidth(60)
 
-        self.qlbl_boxcar_size = Qt.QLabel('Boxcar filter size, [samples at 100 MHz]:')
-        self.qedit_boxcar_size = Qt.QLineEdit('10')
+        self.qlbl_boxcar_size = QtWidgets.QLabel('Boxcar filter size, [samples at 100 MHz]:')
+        self.qedit_boxcar_size = QtWidgets.QLineEdit('10')
         self.qedit_boxcar_size.textChanged.connect(self.residualsClicked)
         self.qedit_boxcar_size.setMaximumWidth(60)
 
         # Saturated or modulo phase 0:
-        self.qlbl_phase0 = Qt.QLabel('Phase residuals 0:')
-        self.qchk_Saturation0 = Qt.QRadioButton('Saturation')
-        self.qchk_Modulo0 = Qt.QRadioButton('Modulo')
-        self.qphase0_group = Qt.QButtonGroup(self)
+        self.qlbl_phase0 = QtWidgets.QLabel('Phase residuals 0:')
+        self.qchk_Saturation0 = QtWidgets.QRadioButton('Saturation')
+        self.qchk_Modulo0 = QtWidgets.QRadioButton('Modulo')
+        self.qphase0_group = QtWidgets.QButtonGroup(self)
         self.qphase0_group.addButton(self.qchk_Saturation0)
         self.qphase0_group.addButton(self.qchk_Modulo0)
 
@@ -439,10 +437,10 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.qchk_Modulo0.clicked.connect(self.residualsClicked)
 
         # Saturated or modulo phase 1:
-        self.qlbl_phase1 = Qt.QLabel('Phase residuals 1:')
-        self.qchk_Saturation1 = Qt.QRadioButton('Saturation')
-        self.qchk_Modulo1 = Qt.QRadioButton('Modulo')
-        self.qphase1_group = Qt.QButtonGroup(self)
+        self.qlbl_phase1 = QtWidgets.QLabel('Phase residuals 1:')
+        self.qchk_Saturation1 = QtWidgets.QRadioButton('Saturation')
+        self.qchk_Modulo1 = QtWidgets.QRadioButton('Modulo')
+        self.qphase1_group = QtWidgets.QButtonGroup(self)
         self.qphase1_group.addButton(self.qchk_Saturation1)
         self.qphase1_group.addButton(self.qchk_Modulo1)
 
@@ -478,15 +476,15 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         ######################################################################
         # Create the widgets which control the DDC settings
         ######################################################################
-        self.qgroupbox_ddc = Qt.QGroupBox('DDC settings')
+        self.qgroupbox_ddc = QtWidgets.QGroupBox('DDC settings')
         self.qgroupbox_ddc.setAutoFillBackground(True)
 
         # Wideband/narrowband DDC0:
-        self.qlbl_ddc0 = Qt.QLabel('DDC 0 filter BW:')
-        self.qchk_Wideband0 = Qt.QRadioButton('Wideband (31 MHz)')
-        self.qchk_Narrowband0 = Qt.QRadioButton('Narrowband (7.5 MHz)')
-        self.qchk_WidebandFIR0 = Qt.QRadioButton('Wideband FIR (62 MHz)')
-        self.qddc0_group = Qt.QButtonGroup(self)
+        self.qlbl_ddc0 = QtWidgets.QLabel('DDC 0 filter BW:')
+        self.qchk_Wideband0 = QtWidgets.QRadioButton('Wideband (31 MHz)')
+        self.qchk_Narrowband0 = QtWidgets.QRadioButton('Narrowband (7.5 MHz)')
+        self.qchk_WidebandFIR0 = QtWidgets.QRadioButton('Wideband FIR (62 MHz)')
+        self.qddc0_group = QtWidgets.QButtonGroup(self)
         self.qddc0_group.addButton(self.qchk_Wideband0)
         self.qddc0_group.addButton(self.qchk_Narrowband0)
         self.qddc0_group.addButton(self.qchk_WidebandFIR0)
@@ -500,13 +498,13 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.qchk_WidebandFIR0.clicked.connect(self.ddcClicked)
 
         # DDC0 CORDIC or Quadrature
-        self.qlbl_ddc0angle = Qt.QLabel('DDC 0 CORDIC or Quadrature:')
-        self.qchk_cordic0 = Qt.QRadioButton('CORDIC')
-        self.qchk_quadrature_msb0 = Qt.QRadioButton('Quadrature MSB')
-        self.qchk_quadrature_lsb0 = Qt.QRadioButton('Quadrature LSB')
-        self.qchk_inphase_msb0 = Qt.QRadioButton('In-Phase MSB')
-        self.qchk_inphase_lsb0 = Qt.QRadioButton('In-Phase LSB')
-        self.qddc0_group = Qt.QButtonGroup(self)
+        self.qlbl_ddc0angle = QtWidgets.QLabel('DDC 0 CORDIC or Quadrature:')
+        self.qchk_cordic0 = QtWidgets.QRadioButton('CORDIC')
+        self.qchk_quadrature_msb0 = QtWidgets.QRadioButton('Quadrature MSB')
+        self.qchk_quadrature_lsb0 = QtWidgets.QRadioButton('Quadrature LSB')
+        self.qchk_inphase_msb0 = QtWidgets.QRadioButton('In-Phase MSB')
+        self.qchk_inphase_lsb0 = QtWidgets.QRadioButton('In-Phase LSB')
+        self.qddc0_group = QtWidgets.QButtonGroup(self)
         self.qddc0_group.addButton(self.qchk_cordic0)
         self.qddc0_group.addButton(self.qchk_quadrature_msb0)
         self.qddc0_group.addButton(self.qchk_quadrature_lsb0)
@@ -524,11 +522,11 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.qchk_inphase_lsb0.clicked.connect(self.ddcClicked)
 
         # Wideband/narrowband DDC1:
-        self.qlbl_ddc1 = Qt.QLabel('DDC 1 filter BW:')
-        self.qchk_Wideband1 = Qt.QRadioButton('Wideband (31 MHz)')
-        self.qchk_Narrowband1 = Qt.QRadioButton('Narrowband (7.5 MHz)')
-        self.qchk_WidebandFIR1 = Qt.QRadioButton('Wideband FIR (62 MHz)')
-        self.qddc1_group = Qt.QButtonGroup(self)
+        self.qlbl_ddc1 = QtWidgets.QLabel('DDC 1 filter BW:')
+        self.qchk_Wideband1 = QtWidgets.QRadioButton('Wideband (31 MHz)')
+        self.qchk_Narrowband1 = QtWidgets.QRadioButton('Narrowband (7.5 MHz)')
+        self.qchk_WidebandFIR1 = QtWidgets.QRadioButton('Wideband FIR (62 MHz)')
+        self.qddc1_group = QtWidgets.QButtonGroup(self)
         self.qddc1_group.addButton(self.qchk_Wideband1)
         self.qddc1_group.addButton(self.qchk_Narrowband1)
         self.qddc1_group.addButton(self.qchk_WidebandFIR1)
@@ -542,13 +540,13 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.qchk_WidebandFIR1.clicked.connect(self.ddcClicked)
 
         # DDC1 CORDIC or Quadrature
-        self.qlbl_ddc1angle = Qt.QLabel('DDC 1 CORDIC or Quadrature:')
-        self.qchk_cordic1 = Qt.QRadioButton('CORDIC')
-        self.qchk_quadrature_msb1 = Qt.QRadioButton('Quadrature MSB')
-        self.qchk_quadrature_lsb1 = Qt.QRadioButton('Quadrature LSB')
-        self.qchk_inphase_msb1 = Qt.QRadioButton('In-Phase MSB')
-        self.qchk_inphase_lsb1 = Qt.QRadioButton('In-Phase LSB')
-        self.qddc1_group = Qt.QButtonGroup(self)
+        self.qlbl_ddc1angle = QtWidgets.QLabel('DDC 1 CORDIC or Quadrature:')
+        self.qchk_cordic1 = QtWidgets.QRadioButton('CORDIC')
+        self.qchk_quadrature_msb1 = QtWidgets.QRadioButton('Quadrature MSB')
+        self.qchk_quadrature_lsb1 = QtWidgets.QRadioButton('Quadrature LSB')
+        self.qchk_inphase_msb1 = QtWidgets.QRadioButton('In-Phase MSB')
+        self.qchk_inphase_lsb1 = QtWidgets.QRadioButton('In-Phase LSB')
+        self.qddc1_group = QtWidgets.QButtonGroup(self)
         self.qddc1_group.addButton(self.qchk_cordic1)
         self.qddc1_group.addButton(self.qchk_quadrature_msb1)
         self.qddc1_group.addButton(self.qchk_quadrature_lsb1)
@@ -601,7 +599,7 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
 
 
 
-        vbox = Qt.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout()
         #FEATURE
         # vbox.addWidget(self.qgroupbox_divider)
         # vbox.addWidget(self.qgroupbox_streaming)

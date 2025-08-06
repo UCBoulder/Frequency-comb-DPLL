@@ -109,9 +109,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 #        self.output_controls = (True, True, True)
 #        self.initUI()
 
-    def __init__(self, sl, strTitle, selected_ADC, output_controls, sp, custom_style_sheet, strFGPASerialNumber):
-        assert isinstance(sl, SuperLaserLand_JD_RP.SuperLaserLand_JD_RP)
-
+    def __init__(self, sl: SuperLaserLand_JD_RP.SuperLaserLand_JD_RP, strTitle, selected_ADC, output_controls, sp, custom_style_sheet, strFGPASerialNumber):
         super(XEM_GUI_MainWindow, self).__init__()
         self.strTitle = strTitle
         self.sl = sl
@@ -305,7 +303,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
                 
                 # Update q_dac_offset
                 self.q_dac_offset[k].blockSignals(True)
-                self.q_dac_offset[k].setValue(q_dac_offset_in_counts)
+                self.q_dac_offset[k].setValue(int(q_dac_offset_in_counts))
                 self.q_dac_offset[k].blockSignals(False)
                 self.setDACOffset_event() # Update RP output
 
@@ -336,7 +334,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
                 q_dac_offset = counts_offset
 
                 self.q_dac_offset[k].blockSignals(True)
-                self.q_dac_offset[k].setValue(q_dac_offset)
+                self.q_dac_offset[k].setValue(int(q_dac_offset))
                 self.q_dac_offset[k].blockSignals(False)
 
                 try:
@@ -387,7 +385,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
                     self.qloop_filters[k].updateGraph()
                 elif k == 2:
                     # DAC 2 loop settings are controlled by the same widget as DAC1
-                    self.qloop_filters[1].kc_dac2 = VCO_gain_in_counts_per_counts
+                    self.qloop_filters[1].kc = VCO_gain_in_counts_per_counts
                     self.qloop_filters[1].checkFirmwareLimits()
                     self.qloop_filters[1].updateFilterSettings()
                     self.qloop_filters[1].updateGraph()
@@ -434,7 +432,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         if large_step > self.sl.dev.DAC_INT_HR/(10):
             large_step = self.sl.dev.DAC_INT_HR/(10)
 
-        self.q_dac_offset[k].setSingleStep(small_step)
+        self.q_dac_offset[k].setSingleStep(int(small_step))
         self.q_dac_offset[k].setPageStep(int(large_step))
     ##
     ## HB, 4/27/2015, Added PWM support on DOUT0
@@ -455,6 +453,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         try:
             frequency_in_hz = float(self.qedit_ref_freq.text())
         except:
+            print("VCO Freq set error")
             frequency_in_hz = 5e6
 
         # If the VCO has positive sign, we need to put a negative reference frequency to make the
@@ -1111,7 +1110,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         self.qadc0_scale.setRange(0, 16)
         #self.qadc0_scale.setScale(0, 16)
         self.qadc0_scale.setValue(0)
-        self.qadc0_scale.setFillColor(Qt.blue)
+        self.qadc0_scale.setFillColor(QtGui.QColor('blue'))
         ticksListMajor = [0, 5, 10, 15]
         ticksListMinor = [2.5, 7.5, 12.5]
         ticksLabelMajor = list(map(str, ticksListMajor))
@@ -1387,7 +1386,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
         self.qgroupbox_loop_filters = QtWidgets.QGroupBox('Loop filters', self)
 
         hbox = QtWidgets.QHBoxLayout()
-        self.qloop_filters = {}
+        self.qloop_filters: dict[int,LoopFiltersUI] = {}
 
         for k in range(3):
             if self.output_controls[k] == True:
@@ -1619,7 +1618,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
                 slider_units = output_offset_in_volts / self.sl.dev.DAC_V_INT
                 #print('calling dac offset slider setValue()')
                 self.q_dac_offset[k].blockSignals(True)
-                self.q_dac_offset[k].setValue(slider_units)
+                self.q_dac_offset[k].setValue(int(slider_units))
                 self.q_dac_offset[k].blockSignals(False)
                 #print('done calling dac offset slider setValue()')
 
@@ -1633,7 +1632,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
 
             slider_units = (self.PWM0_default-self.PWM0_min)/(self.PWM0_max-self.PWM0_min) * 1e6
             self.q_pwm0_value.blockSignals(True)
-            self.q_pwm0_value.setValue(slider_units)
+            self.q_pwm0_value.setValue(int(slider_units))
             self.q_pwm0_value.blockSignals(False)
 
 
@@ -1864,7 +1863,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
                 # For the USB bug, compute the mean from the last points
                 current_output_in_volts = self.sl.dev.DAC_V_INT * np.mean(samples_out[128:256])
                 current_output_in_hz = current_output_in_volts * VCO_gain_in_Hz_per_Volts
-                self.qthermo_dac_current[k].setValue(current_output_in_volts)
+                self.qthermo_dac_current[k].setValue(int(current_output_in_volts))
                 self.qlabel_dac_current_value[k].setText('{:.4f} V\n{:.2f} MHz'.format(current_output_in_volts, current_output_in_hz/1e6))
 
                 elapsed_time = time.time() - start_time
@@ -2343,7 +2342,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
                 max_abs = 1 # to prevent passing a 0 value to the log function, which throws an exception
             max_abs_in_bits = np.log2(max_abs)
 
-            self.qadc0_scale.setValue(max_abs_in_bits)
+            self.qadc0_scale.setValue(int(max_abs_in_bits))
             self.qlabel_adc_fill_value.setText('{:.1f} bits'.format(max_abs_in_bits))
 
             # Compute the SNR on the amplitude of the baseband signal:
@@ -2362,7 +2361,7 @@ class XEM_GUI_MainWindow(QtWidgets.QWidget):
             else:
                 print("Error 'nan' on filtered_baseband_snr")
 
-            self.qthermo_baseband_snr.setValue(baseband_snr)
+            self.qthermo_baseband_snr.setValue(int(baseband_snr))
             self.qlabel_baseband_snr_value.setText('{:.2f} dB'.format(self.filtered_baseband_snr))
 
             #------------------------------------------------------------------

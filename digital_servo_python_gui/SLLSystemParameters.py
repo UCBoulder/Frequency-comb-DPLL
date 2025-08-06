@@ -11,7 +11,7 @@ from __future__ import print_function
 # from xml.etree.ElementTree import ElementTree as ET, Element
 import xml.etree.ElementTree as ET
 
-import SuperLaserLand_JD_RP
+from SuperLaserLand_JD_RP import SuperLaserLand_JD_RP
 
 import json
 
@@ -19,8 +19,7 @@ class SLLSystemParameters():
 
     values_dict = {}
 
-    def __init__(self, sl):
-        assert isinstance(sl, SuperLaserLand_JD_RP.SuperLaserLand_JD_RP)
+    def __init__(self, sl: SuperLaserLand_JD_RP):
         self.sl = sl
 
         self.populateDefaults()

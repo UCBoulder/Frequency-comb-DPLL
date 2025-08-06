@@ -195,11 +195,26 @@ class Loop_filters_module(object):
         self.coef_df = coef_df_int/2.**self.N_DIVIDE_DF
 
         if bDebugOutput:
-            print('P_gain = {:.4g}, in integer: P_gain = {:d} = 2^{:.3f}'.format(self.gain_p, gain_p_int, 1+np.log2(gain_p_int)))
-            print('I_gain = {:.4g}, in integer: I_gain = {:d} = 2^{:.3f}'.format(self.gain_i, gain_i_int, 1+np.log2(gain_i_int)))
-            print('II_gain = {:.4g}, in integer: II_gain = {:d} = 2^{:.3f}'.format(self.gain_ii, gain_ii_int, 1+np.log2(gain_ii_int)))
-            print('D_gain = {:.4g}, in integer: D_gain = {:d} = 2^{:.3f}'.format(self.gain_d, gain_d_int, 1+np.log2(gain_d_int)))
-            print('DF_gain = {:.4g}, in integer: DF_gain = {:d} = 2^{:.3f}'.format(self.coef_df, coef_df_int, 1+np.log2(coef_df_int)))
+            if gain_p_int == 0:
+                print('P_gain = 0')
+            else:
+                print('P_gain = {:.4g}, in integer: P_gain = {:d} = 2^{:.3f}'.format(self.gain_p, gain_p_int, 1+np.log2(gain_p_int)))
+            if gain_i_int == 0:
+                print('I_gain = 0')
+            else:
+                print('I_gain = {:.4g}, in integer: I_gain = {:d} = 2^{:.3f}'.format(self.gain_i, gain_i_int, 1+np.log2(gain_i_int)))
+            if gain_ii_int == 0:
+                print('II_gain = 0')
+            else:
+                print('II_gain = {:.4g}, in integer: II_gain = {:d} = 2^{:.3f}'.format(self.gain_ii, gain_ii_int, 1+np.log2(gain_ii_int)))
+            if gain_d_int == 0:
+                print('D_gain = 0')
+            else:
+                print('D_gain = {:.4g}, in integer: D_gain = {:d} = 2^{:.3f}'.format(self.gain_d, gain_d_int, 1+np.log2(gain_d_int)))
+            if coef_df_int == 0:
+                print('DF_gain = 0')
+            else:
+                print('DF_gain = {:.4g}, in integer: DF_gain = {:d} = 2^{:.3f}'.format(self.coef_df, coef_df_int, 1+np.log2(coef_df_int)))
             print('')
 
         # Send lock/unlock setting

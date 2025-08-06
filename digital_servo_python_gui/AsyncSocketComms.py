@@ -8,14 +8,13 @@ from __future__ import print_function
 
 import socket
 import select
-import time
 
 class AsyncSocketServer():
     
     def __init__(self, port_number=50000):
         self.port_number = port_number
         self.sock_conn = None
-        self.sock_server = None
+        self.sock_server: socket.socket = None
         self.read_buffer = ''
         
         self.bVerbose = False
@@ -28,7 +27,7 @@ class AsyncSocketServer():
         HOST = ''       # means local host
 
         self.sock_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock_server.setblocking(0)
+        self.sock_server.setblocking(False)
         self.sock_server.bind((HOST, self.port_number))
         self.sock_server.listen(5)
 
@@ -42,7 +41,7 @@ class AsyncSocketServer():
         
         if ready_to_read:
             (sock_conn, addr) = self.sock_server.accept()
-            sock_conn.setblocking(0)
+            sock_conn.setblocking(False)
             self.sock_conn = sock_conn
             self.conn_addr = addr
             if self.bVerbose:

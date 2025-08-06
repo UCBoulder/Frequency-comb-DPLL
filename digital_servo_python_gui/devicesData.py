@@ -45,8 +45,8 @@ class devicesData():
         
 
 
-if __name__ == '__main__':
-    device_dict = {}
-    devicesData = devicesData("devices_data.xml")
-    device_dict = devicesData.updateDictionnary(device_dict)
-    print(device_dict)
+# if __name__ == '__main__':
+#     device_dict = {}
+#     devicesData = devicesData("devices_data.xml")
+#     device_dict = devicesData.updateDictionnary(device_dict)
+#     print(device_dict)
