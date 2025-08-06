@@ -10,7 +10,7 @@ from XEM_GUI_MainWindow import XEM_GUI_MainWindow
 
 import RP_PLL
 
-from TestHelpers import *
+from test.TestHelpers import *
 
 def start_qt():
     # Start Qt:

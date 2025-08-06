@@ -1,7 +1,6 @@
 import functools
 import logging
 import RP_PLL # for CommsError
-import pdb
 import traceback
 
 def logCommsErrorsAndBreakoutOfFunction(return_value_on_failure=None):

@@ -14,7 +14,7 @@ from scipy.signal import lfilter
 
 import os
 
-from SuperLaserLand2_JD2_PLL import Loop_filters_module
+from loop_filter_module import Loop_filters_module
 import RP_PLL
 
 class SuperLaserLand_JD_RP:

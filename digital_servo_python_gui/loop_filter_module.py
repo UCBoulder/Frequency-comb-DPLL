@@ -6,12 +6,10 @@ by JD Deschenes, October 2013
 from __future__ import print_function
 
 import numpy as np
-import RP_PLL
+from RP_PLL import RP_PLL_device
 
 class Loop_filters_module(object):
-    def __init__(self, device, channel):
-        assert isinstance(device, RP_PLL.RP_PLL_device)
-        assert isinstance(channel, int)
+    def __init__(self, device: RP_PLL_device, channel: int):
         self.dev = device # instance of RP_PLL for device communications
         self.chan = channel
 

@@ -6,17 +6,15 @@ by JD Deschenes, October 2013
 from __future__ import print_function
 
 import time
-from PyQt5 import QtGui, QtWidgets, QtCore
-#import PyQt5.Qwt5 as Qwt
+from PyQt5 import QtWidgets, QtCore
 import numpy as np
 
-
-#from SuperLaserLand_JD2 import SuperLaserLand_JD2
 from DisplayTransferFunctionWindow import DisplayTransferFunctionWindow
-import weakref
 import SuperLaserLand_JD_RP
 
-import sys # only used for sys.stdout.flush() because Syper's console sometimes doesn't show all print() outputs before crashing...
+# only used for sys.stdout.flush() because Syper's console sometimes doesn't show all print() outputs before crashing...
+import sys
+
 
 class DisplayVNAWindow(QtWidgets.QWidget):
     number_of_windows = 0   # Number of results windows we have opened
@@ -34,13 +32,12 @@ class DisplayVNAWindow(QtWidgets.QWidget):
     def getSystemIdentificationSettings(self):
         # Read the System identification settings from the Red Pitaya the set the correct states when opening the VNA window
         print("TO DO")
-        #return (input_select, output_select, first_modulation_frequency_in_hz, last_modulation_frequency_in_hz, number_of_frequencies, System_settling_time, output_amplitude)
+        # return (input_select, output_select, first_modulation_frequency_in_hz, last_modulation_frequency_in_hz, number_of_frequencies, System_settling_time, output_amplitude)
 
     def getDitherSettings(self):
         # Read the dither settings from the Red Pitaya the set the correct states when opening the VNA window
         print("TO DO")
-        #return (output_select, modulation_frequency_in_hz, output_amplitude, bSquareWave, bEnableDither)
-
+        # return (output_select, modulation_frequency_in_hz, output_amplitude, bSquareWave, bEnableDither)
 
     def runSytemIdentification(self):
 
@@ -59,26 +56,26 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         # Reset the progress bar
         self.qprogress_ident.setValue(0)
 
-        (input_select, output_select, first_modulation_frequency_in_hz, last_modulation_frequency_in_hz, number_of_frequencies, System_settling_time, output_amplitude) = self.readSystemIdentificationSettings()
+        (input_select, output_select, first_modulation_frequency_in_hz, last_modulation_frequency_in_hz,
+         number_of_frequencies, System_settling_time, output_amplitude) = self.readSystemIdentificationSettings()
 
-        self.sl.setup_system_identification(input_select, output_select, first_modulation_frequency_in_hz, last_modulation_frequency_in_hz, number_of_frequencies, System_settling_time, output_amplitude)
+        self.sl.setup_system_identification(input_select, output_select, first_modulation_frequency_in_hz,
+                                            last_modulation_frequency_in_hz, number_of_frequencies, System_settling_time, output_amplitude)
         total_wait_time = 0.1+1.3*self.sl.get_system_identification_wait_time()
         print('Waiting for %f sec...\n' % total_wait_time)
 
         # If the wait time is to be > 1 minute, then give the chance to the user to cancel the action
         if total_wait_time > 60:
             reply = QtWidgets.QMessageBox.question(self, 'Long operation',
-                'Warning! The requested identification will take %.1f minute(s), are you sure you want to continue?' % (total_wait_time/60), QtWidgets.QMessageBox.Yes |
-                QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+                                                   'Warning! The requested identification will take %.1f minute(s), are you sure you want to continue?' % (total_wait_time/60), QtWidgets.QMessageBox.Yes |
+                                                   QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
             if reply == QtWidgets.QMessageBox.No:
                 self.sl.bDDR2InUse = False
                 return
 
-
         self.sl.trigger_system_identification()
 
-
-        ## Wait until the transfer function measurement is finished, while updating the progress bar:
+        # Wait until the transfer function measurement is finished, while updating the progress bar:
         start_time = time.time()
         if total_wait_time > 0.1:
             # Split the wait time in chunks, updating the progress bar every time
@@ -86,11 +83,12 @@ class DisplayVNAWindow(QtWidgets.QWidget):
             # Should implement the wait not as time.sleep(). but by recording the start time, and updating the display
             # while we wait, because sleep() will freeze the GUI. Not the best solution anyway but it shouldn't be that bad
             # especially if we havea nicely updated progress bar.
-#            time.sleep(total_wait_time)
+            #            time.sleep(total_wait_time)
             qapp = QtWidgets.QApplication.instance()
 
             while (time.time()-start_time < total_wait_time) and self.bStop == False:
-                self.qprogress_ident.setValue(  100 * (time.time()-start_time)/total_wait_time )
+                self.qprogress_ident.setValue(
+                    100 * (time.time()-start_time)/total_wait_time)
 #                self.qprogress_ident.update()
                 self.qprogress_ident.repaint()
                 qapp.processEvents()
@@ -108,11 +106,13 @@ class DisplayVNAWindow(QtWidgets.QWidget):
             self.sl.setVNA_mode_register(0, 1, 0)
             return
 
-        #print('runSytemIdentification(): before read')
-        ## Read out the results from the FPGA:
+        # print('runSytemIdentification(): before read')
+        # Read out the results from the FPGA:
         try:
-            (transfer_function_complex, frequency_axis) = self.sl.read_VNA_samples_from_DDR2()
-            print('len(transfer_function_complex) = %d, len(frequency_axis) = %d' % (len(transfer_function_complex), len(frequency_axis)))
+            (transfer_function_complex,
+             frequency_axis) = self.sl.read_VNA_samples_from_DDR2()
+            print('len(transfer_function_complex) = %d, len(frequency_axis) = %d' % (
+                len(transfer_function_complex), len(frequency_axis)))
             print(np.real(transfer_function_complex))
             print(np.imag(transfer_function_complex))
         except:
@@ -123,19 +123,19 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         # Signal to other functions that they can use the DDR2 logger
         self.sl.bDDR2InUse = False
 
-        #print('runSytemIdentification(): after read')
+        # print('runSytemIdentification(): after read')
 
-        ## Scale the transfer function to physical units:
+        # Scale the transfer function to physical units:
         # Current units are (VNA input counts)/(VNA output counts)
         output_volts_per_counts = self.sl.dev.DAC_V_INT
         print('output_volts_per_counts = %s' % output_volts_per_counts)
-
 
         if self.qcombo_transfer_input.currentIndex() == 0 or self.qcombo_transfer_input.currentIndex() == 1:
             # Input units to the VNA were ADC counts.
             # Transfer function units should be scaled to Volts/Volts, or no units:
             volts_per_VNA_input_counts = self.sl.dev.ADC_V_INT
-            print('volts_per_VNA_input_counts = %s' % volts_per_VNA_input_counts)
+            print('volts_per_VNA_input_counts = %s' %
+                  volts_per_VNA_input_counts)
             physical_input_units_per_input_counts = volts_per_VNA_input_counts
 
             physical_units_name = 'V/V'
@@ -164,30 +164,30 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         print('physical_units_name = %s' % physical_units_name)
         self.qprogress_ident.setValue(0)
         # Scale the actual measured transfer function:
-        transfer_function_complex = transfer_function_complex * physical_input_units_per_input_counts / output_volts_per_counts
+        transfer_function_complex = transfer_function_complex * \
+            physical_input_units_per_input_counts / output_volts_per_counts
 
         print('runSytemIdentification(): before creating a window())')
         sys.stdout.flush()
 
-        ## Create a new window to show the transfer function
+        # Create a new window to show the transfer function
         # modified 02-10-2016: we plot everything on the same graph instead, so we open only 1 window
         if self.number_of_windows == 0:
-            self.response_windows[self.number_of_windows] = DisplayTransferFunctionWindow(self.number_of_windows)
+            self.response_windows[self.number_of_windows] = DisplayTransferFunctionWindow(
+                self.number_of_windows)
             self.number_of_windows = self.number_of_windows + 1
         else:
             # do we need to re-create a new window?
             if self.response_windows[0].bClosed:
-                self.response_windows[0] = DisplayTransferFunctionWindow(self.number_of_windows)
-
+                self.response_windows[0] = DisplayTransferFunctionWindow(
+                    self.number_of_windows)
 
         print('runSytemIdentification(): before addCurve())')
         sys.stdout.flush()
 
-        self.response_windows[0].addCurve(frequency_axis, transfer_function_complex, physical_units_name)
+        self.response_windows[0].addCurve(
+            frequency_axis, transfer_function_complex, physical_units_name)
         print('runSytemIdentification(): after addCurve())')
-
-
-
 
     def readSystemIdentificationSettings(self):
         # Input select
@@ -210,7 +210,8 @@ class DisplayVNAWindow(QtWidgets.QWidget):
             pass
 
         try:
-            first_modulation_frequency_in_hz = float(self.qedit_freq_start.text())
+            first_modulation_frequency_in_hz = float(
+                self.qedit_freq_start.text())
             last_modulation_frequency_in_hz = float(self.qedit_freq_end.text())
         except:
             first_modulation_frequency_in_hz = 10e3
@@ -224,7 +225,8 @@ class DisplayVNAWindow(QtWidgets.QWidget):
             pass
 
         try:
-            output_amplitude = int(float(self.sl.DACs_limit_high[output_select] - self.sl.DACs_limit_low[output_select])*float(self.qedit_output_amplitude.text())/2)
+            output_amplitude = int(float(
+                self.sl.DACs_limit_high[output_select] - self.sl.DACs_limit_low[output_select])*float(self.qedit_output_amplitude.text())/2)
             if output_select == 2:
                 # The DAC2 has a particularity in that the VNA outputs only a 16-bit number, and it is multiplied by 4 to fit the 20-bit range of DAC2.
                 output_amplitude = output_amplitude/4
@@ -235,7 +237,6 @@ class DisplayVNAWindow(QtWidgets.QWidget):
 #            output_amplitude = 1
 
         return (input_select, output_select, first_modulation_frequency_in_hz, last_modulation_frequency_in_hz, number_of_frequencies, System_settling_time, output_amplitude)
-
 
     def readDitherSettings(self):
 
@@ -255,9 +256,9 @@ class DisplayVNAWindow(QtWidgets.QWidget):
             modulation_frequency_in_hz = 1e3
             pass
 
-
         try:
-            output_amplitude = int(float(self.sl.DACs_limit_high[output_select] - self.sl.DACs_limit_low[output_select])*float(self.qedit_dither_amplitude.text())/2)
+            output_amplitude = int(float(
+                self.sl.DACs_limit_high[output_select] - self.sl.DACs_limit_low[output_select])*float(self.qedit_dither_amplitude.text())/2)
             if output_select == 2:
                 # The DAC2 has a particularity in that the VNA outputs only a 16-bit number, and it is multiplied by 4 to fit the 20-bit range of DAC2.
                 output_amplitude = output_amplitude/4
@@ -292,16 +293,19 @@ class DisplayVNAWindow(QtWidgets.QWidget):
 
     def ditherClicked(self):
         # Check if dither is set, then call
-#        setVNA_mode_register(self, trigger_dither, stop_flag, bSquareWave):
-        (output_select, modulation_frequency_in_hz, output_amplitude, bSquareWave, bEnableDither) = self.readDitherSettings()
+        #        setVNA_mode_register(self, trigger_dither, stop_flag, bSquareWave):
+        (output_select, modulation_frequency_in_hz, output_amplitude,
+         bSquareWave, bEnableDither) = self.readDitherSettings()
         # This is only really to set the dither
         # we don't care about these values:
         input_select = 0
         number_of_frequencies = 8
         System_settling_time = 1e-3
-        self.sl.setup_system_identification(input_select, output_select, modulation_frequency_in_hz, modulation_frequency_in_hz, number_of_frequencies, System_settling_time, output_amplitude)
+        self.sl.setup_system_identification(input_select, output_select, modulation_frequency_in_hz,
+                                            modulation_frequency_in_hz, number_of_frequencies, System_settling_time, output_amplitude)
 
-        print('(output_select, modulation_frequency_in_hz, output_amplitude, bSquareWave, bEnableDither) = %d, %f, %f, %d, %d' % (output_select, modulation_frequency_in_hz, output_amplitude, bSquareWave, bEnableDither))
+        print('(output_select, modulation_frequency_in_hz, output_amplitude, bSquareWave, bEnableDither) = %d, %f, %f, %d, %d' % (
+            output_select, modulation_frequency_in_hz, output_amplitude, bSquareWave, bEnableDither))
 
         trigger_dither = bEnableDither
         if bEnableDither == False:
@@ -312,14 +316,17 @@ class DisplayVNAWindow(QtWidgets.QWidget):
             self.qbtn_dither.setText("Stop dither")
         bSquareWave = bSquareWave
         self.sl.setVNA_mode_register(trigger_dither, stop_flag, bSquareWave)
-        print('(trigger_dither, stop_flag, bSquareWave) = %d, %d, %d' % (trigger_dither, stop_flag, bSquareWave))
+        print('(trigger_dither, stop_flag, bSquareWave) = %d, %d, %d' %
+              (trigger_dither, stop_flag, bSquareWave))
         return
 
     def updateIntegrationTime(self):
-        (input_select, output_select, first_modulation_frequency_in_hz, last_modulation_frequency_in_hz, number_of_frequencies, System_settling_time, output_amplitude) = self.readSystemIdentificationSettings()
-        integration_time_in_samples = self.sl.compute_integration_time_for_syst_ident(System_settling_time, first_modulation_frequency_in_hz)
-        self.qlbl_integration_time.setText('Integration time per freq [s]: %.1e' % (float(integration_time_in_samples)/self.sl.dev.ADC_CLK_Hz))
-
+        (input_select, output_select, first_modulation_frequency_in_hz, last_modulation_frequency_in_hz,
+         number_of_frequencies, System_settling_time, output_amplitude) = self.readSystemIdentificationSettings()
+        integration_time_in_samples = self.sl.compute_integration_time_for_syst_ident(
+            System_settling_time, first_modulation_frequency_in_hz)
+        self.qlbl_integration_time.setText('Integration time per freq [s]: %.1e' % (
+            float(integration_time_in_samples)/self.sl.dev.ADC_CLK_Hz))
 
     def initUI(self):
 
@@ -328,7 +335,8 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         # Input select
         transfer_input_label = QtWidgets.QLabel('Input:')
         self.qcombo_transfer_input = QtWidgets.QComboBox()
-        self.qcombo_transfer_input.addItems(['ADC 0', 'ADC 1', 'DDC 0', 'DDC 1'])
+        self.qcombo_transfer_input.addItems(
+            ['ADC 0', 'ADC 1', 'DDC 0', 'DDC 1'])
         self.qcombo_transfer_input.setCurrentIndex(2)
 #        transfer_input_label.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
 #        self.qcombo_transfer_input.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
@@ -345,7 +353,8 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         settling_time_label = QtWidgets.QLabel('System settling time [s]:')
         self.qedit_settling_time = QtWidgets.QLineEdit('1e-3')
         self.qedit_settling_time.setMaximumWidth(60)
-        self.qedit_settling_time.editingFinished.connect(self.updateIntegrationTime)
+        self.qedit_settling_time.editingFinished.connect(
+            self.updateIntegrationTime)
 
 #        settling_time_label.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
 #        self.qedit_settling_time.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
@@ -353,7 +362,8 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         freq_start_label = QtWidgets.QLabel('Freq start [Hz]:')
         self.qedit_freq_start = QtWidgets.QLineEdit('10e3')
         self.qedit_freq_start.setMaximumWidth(60)
-        self.qedit_freq_start.editingFinished.connect(self.updateIntegrationTime)
+        self.qedit_freq_start.editingFinished.connect(
+            self.updateIntegrationTime)
 #        freq_start_label.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
 #        self.qedit_freq_start.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
 
@@ -372,7 +382,8 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         self.qedit_output_amplitude.setMaximumWidth(60)
 #        self.qedit_output_amplitude.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
 
-        self.qlbl_integration_time = QtWidgets.QLabel('Integration time per freq [s]: ')
+        self.qlbl_integration_time = QtWidgets.QLabel(
+            'Integration time per freq [s]: ')
         self.updateIntegrationTime()
 
         # Button which triggers the system identification
@@ -382,7 +393,6 @@ class DisplayVNAWindow(QtWidgets.QWidget):
 
         self.qbtn_stop_ident = QtWidgets.QPushButton('Stop identification')
         self.qbtn_stop_ident.clicked.connect(self.stopClicked)
-
 
         # Progress bar which indicates the progression of the identification
         self.qprogress_ident = QtWidgets.QProgressBar()
@@ -397,12 +407,12 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         ######################################################################
         self.qgroupbox_dither = QtWidgets.QGroupBox('Continuous output', self)
 
-
         self.dither_output_label = QtWidgets.QLabel('Output:')
         self.qcombo_dither_output = QtWidgets.QComboBox()
         self.qcombo_dither_output.addItems(['DAC 0', 'DAC 1', 'DAC 2'])
         self.qcombo_dither_output.setCurrentIndex(0)
-        self.qcombo_dither_output.currentIndexChanged.connect(self.ditherClicked)
+        self.qcombo_dither_output.currentIndexChanged.connect(
+            self.ditherClicked)
 
         # Modulation frequency:
         self.qedit_freq_label = QtWidgets.QLabel('Frequency [Hz]:')
@@ -433,7 +443,6 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         self.qbtn_dither.clicked.connect(self.ditherClicked)
         self.qbtn_dither.setCheckable(True)
 
-
         # Put all the widgets into a grid layout
         grid = QtWidgets.QGridLayout()
 
@@ -450,7 +459,8 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         self.qgroupbox_dither.setLayout(grid)
 
         # Spacer which takes up the rest of the space:
-        spacerItem = QtWidgets.QSpacerItem(1, 1, QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem = QtWidgets.QSpacerItem(
+            1, 1, QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Expanding)
 
         # Put all the widgets into a grid layout
         grid = QtWidgets.QGridLayout()
@@ -485,14 +495,11 @@ class DisplayVNAWindow(QtWidgets.QWidget):
 
         self.setLayout(vbox)
 
-
         # Adjust the size and position of the window
 #        self.resize(800, 600)
         self.center()
         self.setWindowTitle('VNA control')
         self.show()
-
-
 
     def center(self):
 
@@ -500,8 +507,5 @@ class DisplayVNAWindow(QtWidgets.QWidget):
         cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
 #        self.move(qr.topLeft())
-        self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + QtCore.QPoint(50, 50))
-
-
-
-
+        self.move(QtWidgets.QDesktopWidget().availableGeometry(
+        ).topLeft() + QtCore.QPoint(50, 50))

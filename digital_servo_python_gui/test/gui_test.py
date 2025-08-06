@@ -14,10 +14,10 @@ import time
 import pdb
 
 from SLLSystemParameters import SLLSystemParameters
-from SuperLaserLand_mock import SuperLaserLand_mock
+from test.SuperLaserLand_mock import SuperLaserLand_mock
 from XEM_GUI_MainWindow import XEM_GUI_MainWindow
 
-from TestHelpers import *
+from test.TestHelpers import *
 
 import RP_PLL
 

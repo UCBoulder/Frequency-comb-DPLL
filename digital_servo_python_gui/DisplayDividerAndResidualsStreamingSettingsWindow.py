@@ -31,8 +31,6 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
 
         self.initUI()
 
-
-
         # This will make the window update the FPGA register
 
         # if bUpdateFPGA == True:
@@ -46,10 +44,9 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.loadParameters()
         self.pushValues()
 
-
     def loadParameters(self):
 
-        filter_select_1    = int((self.sp.getValue('Filter_select', "DAC1")))
+        filter_select_1 = int((self.sp.getValue('Filter_select', "DAC1")))
 
         if filter_select_1 == 0:
             self.qchk_Wideband1.setChecked(True)
@@ -58,7 +55,7 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         elif filter_select_1 == 2:
             self.qchk_WidebandFIR1.setChecked(True)
 
-        filter_select_0    = int((self.sp.getValue('Filter_select', "DAC0")))
+        filter_select_0 = int((self.sp.getValue('Filter_select', "DAC0")))
 
         if filter_select_0 == 0:
             self.qchk_Wideband0.setChecked(True)
@@ -67,8 +64,7 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         elif filter_select_0 == 2:
             self.qchk_WidebandFIR0.setChecked(True)
 
-
-        angle_select_1     = int((self.sp.getValue('Angle_select', "DAC1")))
+        angle_select_1 = int((self.sp.getValue('Angle_select', "DAC1")))
 
         if angle_select_1 == 0:
             self.qchk_cordic1.setChecked(True)
@@ -81,7 +77,7 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         elif angle_select_1 == 4:
             self.qchk_inphase_lsb1.setChecked(True)
 
-        angle_select_0     = int((self.sp.getValue('Angle_select', "DAC0")))
+        angle_select_0 = int((self.sp.getValue('Angle_select', "DAC0")))
 
         if angle_select_0 == 0:
             self.qchk_cordic0.setChecked(True)
@@ -95,9 +91,9 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
             self.qchk_inphase_lsb0.setChecked(True)
 
     def getValues(self):
-        #Get filter_select(0, 1 or 2) for both adc
+        # Get filter_select(0, 1 or 2) for both adc
         (filter_select_1, filter_select_0) = self.sl.get_ddc_filter_select()
-        #Check correspoding radio button
+        # Check correspoding radio button
         if filter_select_1 == 0:
             self.qchk_Wideband1.setChecked(True)
         elif filter_select_1 == 1:
@@ -112,9 +108,9 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         elif filter_select_0 == 2:
             self.qchk_WidebandFIR0.setChecked(True)
 
-        #Get angle_select (0, 1, 2, 3 or 4) for both adc
+        # Get angle_select (0, 1, 2, 3 or 4) for both adc
         (angle_select_1, angle_select_0) = self.sl.get_ddc_angle_select()
-        #Check correspoding radio button
+        # Check correspoding radio button
         if angle_select_1 == 0:
             self.qchk_cordic1.setChecked(True)
         elif angle_select_1 == 1:
@@ -125,7 +121,6 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
             self.qchk_inphase_msb1.setChecked(True)
         elif angle_select_1 == 4:
             self.qchk_inphase_lsb1.setChecked(True)
-
 
         if angle_select_0 == 0:
             self.qchk_cordic0.setChecked(True)
@@ -140,7 +135,7 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
 
     def retrieveValues(self):
         outdict = {}
-        
+
         (filter_select_1, filter_select_0) = self.sl.get_ddc_filter_select()
         (angle_select_1, angle_select_0) = self.sl.get_ddc_angle_select()
 
@@ -149,7 +144,6 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         outdict['angle_select_0'] = angle_select_0
         outdict['angle_select_1'] = angle_select_1
         return outdict
-        
 
     def updateClicked(self):
         # Read user-entered settings:
@@ -163,14 +157,14 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         # Update display:
         self.qlbl_actual_frequency.setText('%f' % output_freq)
 
-        self.sl.set_clk_divider_settings(bDividerOn, bPulses, clk_divider_modulus-1)
-
+        self.sl.set_clk_divider_settings(
+            bDividerOn, bPulses, clk_divider_modulus-1)
 
     def readSettings(self):
 
-#        self.clk_divider_modulus = clk_divider_modulus
-#        self.bDividerOn = bDividerOn
-#        self.bPulses = bPulses
+        #        self.clk_divider_modulus = clk_divider_modulus
+        #        self.bDividerOn = bDividerOn
+        #        self.bPulses = bPulses
 
         try:
             self.clk_divider_modulus = int(float(self.qedit_modulus.text()))
@@ -216,7 +210,7 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
 #        return (data_delay, trigger_delay, boxcar_size)
 
     def residualsClicked(self):
-#        (data_delay, trigger_delay, boxcar_filter_size) = self.readStreamingSettings()
+        #        (data_delay, trigger_delay, boxcar_filter_size) = self.readStreamingSettings()
         rst_residuals_streaming = 0
 #        self.sl.setResidualsStreamingSettings(data_delay, trigger_delay, boxcar_filter_size, rst_residuals_streaming)
 
@@ -228,9 +222,8 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         phase_or_freq = int(self.qchk_Modulo1.isChecked())
         self.sl.set_residuals_phase_or_freq(adc_number, phase_or_freq)
 
-
     def ddcClicked(self):
-#        (data_delay, trigger_delay, boxcar_filter_size) = self.readStreamingSettings()  # Default (1,1,2)
+        #        (data_delay, trigger_delay, boxcar_filter_size) = self.readStreamingSettings()  # Default (1,1,2)
         rst_residuals_streaming = 0
 #        self.sl.setResidualsStreamingSettings(data_delay, trigger_delay, boxcar_filter_size, rst_residuals_streaming)   # Default (1,1,2,0)
 
@@ -254,7 +247,6 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
             angle_select = 4
         self.sl.set_ddc_filter(adc_number, filter_select, angle_select)
 
-
         adc_number = 1
         if self.qchk_Wideband1.isChecked():
             filter_select = 0
@@ -275,11 +267,12 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
             angle_select = 4
         self.sl.set_ddc_filter(adc_number, filter_select, angle_select)
 
-
     def phaseIncrement(self):
         try:
             phase_increment = float(self.qedit_phaseinc.text())
-            phase_increment = int(round(2*self.sl.dev.ADC_CLK_Hz * phase_increment))    # converts from time units to samples
+            # converts from time units to samples
+            phase_increment = int(
+                round(2*self.sl.dev.ADC_CLK_Hz * phase_increment))
 
             # We need to know the counter modulus so we can convert negative offsets into positive offsets through a modulo operation
             (clk_divider_modulus, bDividerOn, bPulses) = self.readSettings()
@@ -301,48 +294,48 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
                 if float(self.qedit_phaseinc.text()) < 0:
                     # This puts the correct offset, but also flips the phase
                     self.sl.adjust_clk_divider_phase(phase_increment)
-                    time.sleep(50e-3 + 10*clk_divider_actual_modulus/(2*self.sl.dev.ADC_CLK_Hz))
+                    time.sleep(50e-3 + 10*clk_divider_actual_modulus /
+                               (2*self.sl.dev.ADC_CLK_Hz))
                     # These two extra steps are to adjust the phase:
                     first_step = int(round(clk_divider_modulus/2))
                     second_step = int(clk_divider_modulus-first_step)
                     self.sl.adjust_clk_divider_phase(first_step)
-                    time.sleep(50e-3 + 10*clk_divider_actual_modulus/(2*self.sl.dev.ADC_CLK_Hz))
+                    time.sleep(50e-3 + 10*clk_divider_actual_modulus /
+                               (2*self.sl.dev.ADC_CLK_Hz))
                     self.sl.adjust_clk_divider_phase(second_step)
                 else:
                     # This case is easier:
                     self.sl.adjust_clk_divider_phase(phase_increment)
 
-
-
-
             phase_increment = phase_increment % clk_divider_actual_modulus
         except:
             phase_increment = 0
 
-
-
     def initUI(self):
-
 
         ######################################################################
         # Create the widgets which control the clk divider module:
         # Needs: clk_divider_modulus, bDividerOn, bPulses or Square Wave
         ######################################################################
-        self.qgroupbox_divider = QtWidgets.QGroupBox('Clk divider settings (Triggers the PRBS generator on DOUT2), enter to accept changes')
+        self.qgroupbox_divider = QtWidgets.QGroupBox(
+            'Clk divider settings (Triggers the PRBS generator on DOUT2), enter to accept changes')
         self.qgroupbox_divider.setAutoFillBackground(True)
 
         if self.bPulses:
             output_freq = 2*self.sl.dev.ADC_CLK_Hz/(self.clk_divider_modulus)
         else:
             # square wave mode:
-            output_freq = 2*self.sl.dev.ADC_CLK_Hz/(2*(self.clk_divider_modulus))
+            output_freq = 2*self.sl.dev.ADC_CLK_Hz / \
+                (2*(self.clk_divider_modulus))
 
-
-        self.qlbl_modulus = QtWidgets.QLabel('Modulus [2, 2^32-1], [samples at 200 MHz]:')
-        self.qedit_modulus = QtWidgets.QLineEdit(str(int(self.clk_divider_modulus+1)))
+        self.qlbl_modulus = QtWidgets.QLabel(
+            'Modulus [2, 2^32-1], [samples at 200 MHz]:')
+        self.qedit_modulus = QtWidgets.QLineEdit(
+            str(int(self.clk_divider_modulus+1)))
         self.qedit_modulus.editingFinished.connect(self.updateClicked)
 
-        self.qlbl_phaseinc = QtWidgets.QLabel('Time increment [-Period, Period], [seconds]:')
+        self.qlbl_phaseinc = QtWidgets.QLabel(
+            'Time increment [-Period, Period], [seconds]:')
         self.qedit_phaseinc = QtWidgets.QLineEdit('0')
 #        self.qedit_phaseinc.editingFinished.connect(self.phaseIncrement)
         self.qbtn_phaseinc = QtWidgets.QPushButton('Apply')
@@ -371,7 +364,6 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.qbtn_divider_on.setCheckable(True)
         self.qbtn_divider_on.setChecked(bool(self.bDividerOn))
 
-
         # Put all the widgets into a grid layout
         grid = QtWidgets.QGridLayout()
 
@@ -382,7 +374,6 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         grid.addWidget(self.qedit_phaseinc,             1, 1)
         grid.addWidget(self.qbtn_phaseinc,              1, 2)
 
-
         grid.addWidget(self.qlbl_freq,                  2, 0)
         grid.addWidget(self.qlbl_actual_frequency,      2, 1, 1, 2)
         grid.addWidget(self.qradio_pulses,              3, 0)
@@ -392,32 +383,35 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
 
         self.qgroupbox_divider.setLayout(grid)
 
-
         ######################################################################
         # Create the widgets which control the residuals streaming module:
         # Needs: data_delay, trigger_delay, boxcar_filter_size
         ######################################################################
-        self.qgroupbox_streaming = QtWidgets.QGroupBox('Residuals streaming settings')
+        self.qgroupbox_streaming = QtWidgets.QGroupBox(
+            'Residuals streaming settings')
         self.qgroupbox_streaming.setAutoFillBackground(True)
 
         if self.bPulses:
             output_freq = 2*self.sl.dev.ADC_CLK_Hz/(self.clk_divider_modulus)
         else:
             # square wave mode:
-            output_freq = 2*self.sl.dev.ADC_CLK_Hz/(2*(self.clk_divider_modulus))
+            output_freq = 2*self.sl.dev.ADC_CLK_Hz / \
+                (2*(self.clk_divider_modulus))
 
-
-        self.qlbl_data_delay = QtWidgets.QLabel('Data delay, [samples at 100 MHz]:')
+        self.qlbl_data_delay = QtWidgets.QLabel(
+            'Data delay, [samples at 100 MHz]:')
         self.qedit_data_delay = QtWidgets.QLineEdit('1')
         self.qedit_data_delay.textChanged.connect(self.residualsClicked)
         self.qedit_data_delay.setMaximumWidth(60)
 
-        self.qlbl_trigger_delay = QtWidgets.QLabel('Trigger delay, [samples at 100 MHz]:')
+        self.qlbl_trigger_delay = QtWidgets.QLabel(
+            'Trigger delay, [samples at 100 MHz]:')
         self.qedit_trigger_delay = QtWidgets.QLineEdit('1')
         self.qedit_trigger_delay.textChanged.connect(self.residualsClicked)
         self.qedit_trigger_delay.setMaximumWidth(60)
 
-        self.qlbl_boxcar_size = QtWidgets.QLabel('Boxcar filter size, [samples at 100 MHz]:')
+        self.qlbl_boxcar_size = QtWidgets.QLabel(
+            'Boxcar filter size, [samples at 100 MHz]:')
         self.qedit_boxcar_size = QtWidgets.QLineEdit('10')
         self.qedit_boxcar_size.textChanged.connect(self.residualsClicked)
         self.qedit_boxcar_size.setMaximumWidth(60)
@@ -450,9 +444,6 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.qchk_Saturation1.clicked.connect(self.residualsClicked)
         self.qchk_Modulo1.clicked.connect(self.residualsClicked)
 
-
-
-
         # Put all the widgets into a grid layout
         grid = QtWidgets.QGridLayout()
 
@@ -483,7 +474,8 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.qlbl_ddc0 = QtWidgets.QLabel('DDC 0 filter BW:')
         self.qchk_Wideband0 = QtWidgets.QRadioButton('Wideband (31 MHz)')
         self.qchk_Narrowband0 = QtWidgets.QRadioButton('Narrowband (7.5 MHz)')
-        self.qchk_WidebandFIR0 = QtWidgets.QRadioButton('Wideband FIR (62 MHz)')
+        self.qchk_WidebandFIR0 = QtWidgets.QRadioButton(
+            'Wideband FIR (62 MHz)')
         self.qddc0_group = QtWidgets.QButtonGroup(self)
         self.qddc0_group.addButton(self.qchk_Wideband0)
         self.qddc0_group.addButton(self.qchk_Narrowband0)
@@ -525,7 +517,8 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.qlbl_ddc1 = QtWidgets.QLabel('DDC 1 filter BW:')
         self.qchk_Wideband1 = QtWidgets.QRadioButton('Wideband (31 MHz)')
         self.qchk_Narrowband1 = QtWidgets.QRadioButton('Narrowband (7.5 MHz)')
-        self.qchk_WidebandFIR1 = QtWidgets.QRadioButton('Wideband FIR (62 MHz)')
+        self.qchk_WidebandFIR1 = QtWidgets.QRadioButton(
+            'Wideband FIR (62 MHz)')
         self.qddc1_group = QtWidgets.QButtonGroup(self)
         self.qddc1_group.addButton(self.qchk_Wideband1)
         self.qddc1_group.addButton(self.qchk_Narrowband1)
@@ -563,18 +556,15 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         self.qchk_inphase_msb1.clicked.connect(self.ddcClicked)
         self.qchk_inphase_lsb1.clicked.connect(self.ddcClicked)
 
-
-
         # Put all the widgets into a grid layout
         grid = QtWidgets.QGridLayout()
-
 
         grid.addWidget(self.qlbl_ddc0,                0, 0)
         grid.addWidget(self.qchk_Wideband0,           0, 1)
         grid.addWidget(self.qchk_Narrowband0,         0, 2)
         grid.addWidget(self.qchk_WidebandFIR0,        0, 3)
 
-        #FEATURE
+        # FEATURE
         grid.addWidget(self.qlbl_ddc0angle,           1, 0)
         grid.addWidget(self.qchk_cordic0,             1, 1)
         grid.addWidget(self.qchk_quadrature_msb0,     1, 2)
@@ -587,7 +577,7 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         grid.addWidget(self.qchk_Narrowband1,         3, 2)
         grid.addWidget(self.qchk_WidebandFIR1,        3, 3)
 
-        #FEATURE
+        # FEATURE
         grid.addWidget(self.qlbl_ddc1angle,           4, 0)
         grid.addWidget(self.qchk_cordic1,             4, 1)
         grid.addWidget(self.qchk_quadrature_msb1,     4, 2)
@@ -597,24 +587,19 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
 
         self.qgroupbox_ddc.setLayout(grid)
 
-
-
         vbox = QtWidgets.QVBoxLayout()
-        #FEATURE
+        # FEATURE
         # vbox.addWidget(self.qgroupbox_divider)
         # vbox.addWidget(self.qgroupbox_streaming)
         vbox.addWidget(self.qgroupbox_ddc)
         vbox.addStretch(1)
         self.setLayout(vbox)
 
-
         # Adjust the size and position of the window
 #        self.resize(800, 600)
         self.center()
         self.setWindowTitle(self.custom_shorthand + ': Peripherals settings')
-        #self.show()
-
-
+        # self.show()
 
     def center(self):
 
@@ -623,7 +608,3 @@ class DisplayDividerAndResidualsStreamingSettingsWindow(QtWidgets.QWidget):
         qr.moveCenter(cp)
 #        self.move(qr.topLeft())
 #        self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(50, 50))
-
-
-
-

@@ -8,64 +8,69 @@ import time
 import sys
 
 import numpy as np
-#import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+
 
 class socket_placeholder():
     def __init__(self):
         pass
+
     def sendall(self, *args, **kwargs):
-        print("socket_placeholder::sendall(): No active socket. Was called from {}".format(sys._getframe().f_back.f_code.co_name))
+        print("socket_placeholder::sendall(): No active socket. Was called from {}".format(
+            sys._getframe().f_back.f_code.co_name))
         pass
+
     def recv(self, *args, **kwargs):
         print("socket_placeholder::recv(): No active socket")
         return []
 
+
 class RP_PLL_device():
     ###########################################################################
-    #--- System Constants:
+    # --- System Constants:
     ###########################################################################
     #
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Primary ADC Inputs:
     #
 
     ADC_CLK_Hz = int(125e6)  # ADC sampling rate
 
-    ADC_N_BITS = 16 # actual output is 14, but 16 are used internally
-    ADC_INT_HR = 2**(ADC_N_BITS-1)-1 # Signed integers per half range, N/HR
-    ADC_V_HR = 1 # Voltage input per half range, V/HR
-    ADC_V_INT = ADC_V_HR/ADC_INT_HR # Voltage per integer, V/N
+    ADC_N_BITS = 16  # actual output is 14, but 16 are used internally
+    ADC_INT_HR = 2**(ADC_N_BITS-1)-1  # Signed integers per half range, N/HR
+    ADC_V_HR = 1  # Voltage input per half range, V/HR
+    ADC_V_INT = ADC_V_HR/ADC_INT_HR  # Voltage per integer, V/N
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Primary DAC Outputs:
     #
 
     DAC_CLK_Hz = int(62.5e6)  # DAC sampling rate
 
-    DAC_N_BITS = 16 # actual output is 14, but 16 are used internally
-    DAC_INT_HR = 2**(DAC_N_BITS-1)-1 # Signed integers per half range, N/HR
-    DAC_V_HR = 1 # Voltage output per half range, V/HR
-    DAC_V_INT = DAC_V_HR/DAC_INT_HR # Voltage per integer, V/N
+    DAC_N_BITS = 16  # actual output is 14, but 16 are used internally
+    DAC_INT_HR = 2**(DAC_N_BITS-1)-1  # Signed integers per half range, N/HR
+    DAC_V_HR = 1  # Voltage output per half range, V/HR
+    DAC_V_INT = DAC_V_HR/DAC_INT_HR  # Voltage per integer, V/N
 
-    DAC_LIM_LOW_INT = [-DAC_INT_HR, -DAC_INT_HR, 0] # Hardware Limits
+    DAC_LIM_LOW_INT = [-DAC_INT_HR, -DAC_INT_HR, 0]  # Hardware Limits
     DAC_LIM_HIGH_INT = [DAC_INT_HR, DAC_INT_HR, 0]
 
     ###########################################################################
-    #--- Zynq Register Commands:
+    # --- Zynq Register Commands:
     ###########################################################################
     #
 
-    MAGIC_BYTES_WRITE_REG       = 0xABCD1233
-    MAGIC_BYTES_READ_REG        = 0xABCD1234
-    MAGIC_BYTES_READ_BUFFER     = 0xABCD1235
+    MAGIC_BYTES_WRITE_REG = 0xABCD1233
+    MAGIC_BYTES_READ_REG = 0xABCD1234
+    MAGIC_BYTES_READ_BUFFER = 0xABCD1235
 
-    MAGIC_BYTES_WRITE_FILE      = 0xABCD1237
-    MAGIC_BYTES_SHELL_COMMAND   = 0xABCD1238
-    MAGIC_BYTES_REBOOT_MONITOR  = 0xABCD1239
+    MAGIC_BYTES_WRITE_FILE = 0xABCD1237
+    MAGIC_BYTES_SHELL_COMMAND = 0xABCD1238
+    MAGIC_BYTES_REBOOT_MONITOR = 0xABCD1239
 
     ###########################################################################
-    #--- Red Pitaya Top Module:
+    # --- Red Pitaya Top Module:
     ###########################################################################
     # red_pitaya_top.v
     #
@@ -73,22 +78,22 @@ class RP_PLL_device():
     # Red Pitaya Top Zynq Address:
     RP_TOP_ADDR = 0x40000000
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # System Bus Read/Write Enable Decoder and Multiplexer:
     #
 
     # Red Pitaya Code Segment Address Offsets:
-    DPLL_CS =           (0 << (6-1)*4 ) # DPLL write and legacy "Opal Kelly" IO
-    DATA_LOGGER_CS =    (1 << (6-1)*4 ) # Data Logger
-    DPLL_READ_CS =      (2 << (6-1)*4 ) # DPLL read
-    RP_HK_CS =          (3 << (6-1)*4 ) # Red Pitaya house keeping (HK)
-    RP_AMS_CS =         (4 << (6-1)*4 ) # Red Pitaya analog mixed signlas (AMS)
-    VCO_MUX_CS =        (5 << (6-1)*4 ) # VCO Output MUX
-    VCO_CS =            (6 << (6-1)*4 ) # VCO
-    FREE_CS =           (7 << (6-1)*4 ) # not actively used
+    DPLL_CS = (0 << (6-1)*4)  # DPLL write and legacy "Opal Kelly" IO
+    DATA_LOGGER_CS = (1 << (6-1)*4)  # Data Logger
+    DPLL_READ_CS = (2 << (6-1)*4)  # DPLL read
+    RP_HK_CS = (3 << (6-1)*4)  # Red Pitaya house keeping (HK)
+    RP_AMS_CS = (4 << (6-1)*4)  # Red Pitaya analog mixed signlas (AMS)
+    VCO_MUX_CS = (5 << (6-1)*4)  # VCO Output MUX
+    VCO_CS = (6 << (6-1)*4)  # VCO
+    FREE_CS = (7 << (6-1)*4)  # not actively used
 
     ###########################################################################
-    #--- DPLL:
+    # --- DPLL:
     ###########################################################################
     # dpll_wrapper.v
     #
@@ -96,14 +101,14 @@ class RP_PLL_device():
     # Internal DPLL offset to Zynq Compatible Offset Address Multiplier:
     DPLL_MLTP = 4
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Reset Signals:
     #
 
     # Reset Address Offsets:
     BUS_ADDR_TRIG_RESET_FRONTEND = 0x0044
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Digital Down Conversion (DDC):
     #
 
@@ -129,13 +134,15 @@ class RP_PLL_device():
     # "Scaled Radians" (-pi to pi -> -1 to 1). See the LogiCore CORDIC product
     # guide for details.
     DDC_SR_PHASE_N_BITS = DDC_FREQ_N_BITS = 10
-    DDC_SR_PHASE_INT_HR = DDC_FREQ_INT_HR = 2**(DDC_SR_PHASE_N_BITS-1)-1 # Signed integers per half range, N/HR
-    DDC_PHASE_SR_HR = 1 - 2**(-DDC_SR_PHASE_N_BITS) # Scaled radians per half range, SR/HR
+    # Signed integers per half range, N/HR
+    DDC_SR_PHASE_INT_HR = DDC_FREQ_INT_HR = 2**(DDC_SR_PHASE_N_BITS-1)-1
+    # Scaled radians per half range, SR/HR
+    DDC_PHASE_SR_HR = 1 - 2**(-DDC_SR_PHASE_N_BITS)
     # The frequency offset is calculated as the cycle difference per clock cycle
-    DDC_FREQ_Hz_HR = DDC_PHASE_SR_HR/2 * ADC_CLK_Hz # Frequency per half range, Hz/HR
-    DDC_FREQ_INT = DDC_FREQ_Hz_HR/DDC_FREQ_INT_HR # Frequency per integer, Hz/N
+    DDC_FREQ_Hz_HR = DDC_PHASE_SR_HR/2 * ADC_CLK_Hz  # Frequency per half range, Hz/HR
+    DDC_FREQ_INT = DDC_FREQ_Hz_HR/DDC_FREQ_INT_HR  # Frequency per integer, Hz/N
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Loop Filters:
     #
 
@@ -149,7 +156,7 @@ class RP_PLL_device():
     BUS_OFFSET_GAIN_II_MSBs = 0x5    # [0x7005, 0x7015, 0x7025]
     BUS_OFFSET_GAIN_D = 0x6     # [0x7006, 0x7016, 0x7026]
     BUS_OFFSET_COEF_DF = 0x7    # [0x7007, 0x7017, 0x7027]
-    BUS_OFFSET_GAIN_OL = 0x8 #[0x9010, 0x9011, 0x9012]
+    BUS_OFFSET_GAIN_OL = 0x8  # [0x9010, 0x9011, 0x9012]
 
     # Loop Filter Constants:
     N_BITS_DIVIDE_P = [16]*3
@@ -165,15 +172,15 @@ class RP_PLL_device():
     N_BITS_GAIN_D = [32]*3
     N_BITS_COEF_DF = [18]*3
 
-    N_CYCLS_DELAY_P = [5]*3 # TODO: put the correct values here
-    N_CYCLES_DELAY_I = [8]*3 # TODO: put the correct values here
-    N_CYCLES_DELAY_II = [10]*3 # TODO: put the correct values here
-    N_CYCLES_DELAY_D = [12]*3 # TODO: put the correct values here
+    N_CYCLS_DELAY_P = [5]*3  # TODO: put the correct values here
+    N_CYCLES_DELAY_I = [8]*3  # TODO: put the correct values here
+    N_CYCLES_DELAY_II = [10]*3  # TODO: put the correct values here
+    N_CYCLES_DELAY_D = [12]*3  # TODO: put the correct values here
 
     # Channel 1 Loop Filter Input Multiplexer Address Offset:
     BUS_ADDR_MUX_PLL1 = 0x9000
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Dither and Lock-In:
     #
 
@@ -182,46 +189,47 @@ class RP_PLL_device():
     BUS_ADDR_dither_period_divided_by_4_minus_one = [0x8101, 0x8201, 0x8301]
     BUS_ADDR_dither_N_periods_minus_one = [0x8102, 0x8202, 0x8302]
     BUS_ADDR_dither_amplitude = [0x8103, 0x8203, 0x8303]
-    BUS_ADDR_dither_mode_auto = [0x8104, 0x8204, 0x8304] # For reconnection purpose
+    BUS_ADDR_dither_mode_auto = [0x8104, 0x8204,
+                                 0x8304]  # For reconnection purpose
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Vector Network Analyzer (VNA)
     #
 
     # VNA Address Offsets:
-    BUS_ADDR_TRIG_SYSTEM_IDENTIFICATION                 = 0x0042
-    BUS_ADDR_number_of_cycles_integration               = 0x5000
-    BUS_ADDR_first_modulation_frequency_lsbs            = 0x5001
-    BUS_ADDR_first_modulation_frequency_msbs            = 0x5002
-    BUS_ADDR_modulation_frequency_step_lsbs             = 0x5003
-    BUS_ADDR_modulation_frequency_step_msbs             = 0x5004
-    BUS_ADDR_number_of_frequencies                      = 0x5005
-    BUS_ADDR_output_gain                                = 0x5006
-    BUS_ADDR_input_and_output_mux_selector              = 0x5007
-    BUS_ADDR_VNA_mode_control                           = 0x5008
+    BUS_ADDR_TRIG_SYSTEM_IDENTIFICATION = 0x0042
+    BUS_ADDR_number_of_cycles_integration = 0x5000
+    BUS_ADDR_first_modulation_frequency_lsbs = 0x5001
+    BUS_ADDR_first_modulation_frequency_msbs = 0x5002
+    BUS_ADDR_modulation_frequency_step_lsbs = 0x5003
+    BUS_ADDR_modulation_frequency_step_msbs = 0x5004
+    BUS_ADDR_number_of_frequencies = 0x5005
+    BUS_ADDR_output_gain = 0x5006
+    BUS_ADDR_input_and_output_mux_selector = 0x5007
+    BUS_ADDR_VNA_mode_control = 0x5008
 
     # VNA Direct Digital Synthesis (DDS) Local Oscilator Constants:
-    VNA_DDS_PHASE_ACCUM_N_BITS = 48 #TODO: make these distinct IPs from the DDC
+    VNA_DDS_PHASE_ACCUM_N_BITS = 48  # TODO: make these distinct IPs from the DDC
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Primary DAC Outputs:
     #
 
     # Primary DAC Output Address Offsets:
-    BUS_ADDR_DAC_offset = [0x6000, 0x6001, 0x6002] # 0x6002 not actively used
+    BUS_ADDR_DAC_offset = [0x6000, 0x6001, 0x6002]  # 0x6002 not actively used
     BUS_ADDR_dac0_limits = 0x6101
     BUS_ADDR_dac1_limits = 0x6102
-    BUS_ADDR_dac2_limit_low = 0x6103 # not actively used
-    BUS_ADDR_dac2_limit_high = 0x6104 # not actively used
+    BUS_ADDR_dac2_limit_low = 0x6103  # not actively used
+    BUS_ADDR_dac2_limit_high = 0x6104  # not actively used
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Pulse Width Managed (PWM) DAC Outputs:
     #
 
     # PWM DAC Address Offsets:
-    BUS_ADDR_PWM0                                       = 0x6621
+    BUS_ADDR_PWM0 = 0x6621
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Frequency Counters:
     #
 
@@ -231,7 +239,7 @@ class RP_PLL_device():
     # Gate Time in Number of Samples for the Frequency Counter:
     COUNTER_GATE_TIME_N_CYCLES = int(125e6)
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Residuals Monitor:
     #
 
@@ -239,27 +247,27 @@ class RP_PLL_device():
     BUS_ADDR_phase_residuals_threshold = [0x8400, 0x8401]
     BUS_ADDR_freq_residuals0_threshold = 0x8410
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Data Logger Interface:
     #
 
     # Data Logger Multiplexer Address Offset:
-    BUS_ADDR_MUX_SELECTORS  = 0x0003
+    BUS_ADDR_MUX_SELECTORS = 0x0003
 
     # Data Logger Multiplexer Constants:
-    SELECT_ADC0             = 0
-    SELECT_ADC1             = 1
-    SELECT_DDC0             = 2
-    SELECT_DDC1             = 3
-    SELECT_VNA              = 4
-    SELECT_COUNTER          = 5
-    SELECT_DAC0             = 6
-    SELECT_DAC1             = 7
-    SELECT_DAC2             = 8
-    SELECT_CRASH_MONITOR    = 2**4
-    SELECT_IN10             = 2**4 + 2**3
+    SELECT_ADC0 = 0
+    SELECT_ADC1 = 1
+    SELECT_DDC0 = 2
+    SELECT_DDC1 = 3
+    SELECT_VNA = 4
+    SELECT_COUNTER = 5
+    SELECT_DAC0 = 6
+    SELECT_DAC1 = 7
+    SELECT_DAC2 = 8
+    SELECT_CRASH_MONITOR = 2**4
+    SELECT_IN10 = 2**4 + 2**3
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Legacy "Opal Kelly" Interface:
     #
 
@@ -268,40 +276,42 @@ class RP_PLL_device():
 
     # Dither Lock-In Address Offsets:
     BUS_ADDR_DITHER0_LOCKIN_REAL_LSB = 0x0026
-    BUS_ADDR_DITHER0_LOCKIN_REAL_MSB = 0x0027 # must be read after 0x0026
+    BUS_ADDR_DITHER0_LOCKIN_REAL_MSB = 0x0027  # must be read after 0x0026
     BUS_ADDR_DITHER1_LOCKIN_REAL_LSB = 0x0029
-    BUS_ADDR_DITHER1_LOCKIN_REAL_MSB = 0x002A # must be read after 0x0029
+    BUS_ADDR_DITHER1_LOCKIN_REAL_MSB = 0x002A  # must be read after 0x0029
 
     # Counter and DAC Stream Address Offsets:
     BUS_ADDR_ZERO_DEADTIME_SAMPLES_NUMBER = 0x0030
-    BUS_ADDR_ZERO_DEADTIME_COUNTER0_LSBS = 0x0031 # must be read after 0x0030
-    BUS_ADDR_ZERO_DEADTIME_COUNTER0_MSBS = 0x0032 # must be read after 0x0030
-    BUS_ADDR_ZERO_DEADTIME_COUNTER1_LSBS = 0x0033 # must be read after 0x0030
-    BUS_ADDR_ZERO_DEADTIME_COUNTER1_MSBS = 0x0034 # must be read after 0x0030
-    BUS_ADDR_DAC0_CURRENT = 0x0035 # must be read after 0x0030
-    BUS_ADDR_DAC1_CURRENT = 0x0036 # must be read after 0x0030
+    BUS_ADDR_ZERO_DEADTIME_COUNTER0_LSBS = 0x0031  # must be read after 0x0030
+    BUS_ADDR_ZERO_DEADTIME_COUNTER0_MSBS = 0x0032  # must be read after 0x0030
+    BUS_ADDR_ZERO_DEADTIME_COUNTER1_LSBS = 0x0033  # must be read after 0x0030
+    BUS_ADDR_ZERO_DEADTIME_COUNTER1_MSBS = 0x0034  # must be read after 0x0030
+    BUS_ADDR_DAC0_CURRENT = 0x0035  # must be read after 0x0030
+    BUS_ADDR_DAC1_CURRENT = 0x0036  # must be read after 0x0030
 
     # FIFO Address Offsets:
-    BUS_ADDR_FIFO_TOUT = 0x0037 # not actively used
-    BUS_ADDR_FIFO_EMPTY = 0x0038 # not actively used
-    BUS_ADDR_FIFO_DOUT = 0x0039 # not actively used
-    BUS_ADDR_FIFO_COUNT = 0x0040 # not actively used
-    BUS_ADDR_FIFO_WRT_ENABLE = 0x0041 # not actively used
-    BUS_ADDR_FIFO_RESET = 0x0042 # !!!: Conflict with BUS_ADDR_TRIG_SYSTEM_IDENTIFICATION
+    BUS_ADDR_FIFO_TOUT = 0x0037  # not actively used
+    BUS_ADDR_FIFO_EMPTY = 0x0038  # not actively used
+    BUS_ADDR_FIFO_DOUT = 0x0039  # not actively used
+    BUS_ADDR_FIFO_COUNT = 0x0040  # not actively used
+    BUS_ADDR_FIFO_WRT_ENABLE = 0x0041  # not actively used
+    BUS_ADDR_FIFO_RESET = 0x0042  # !!!: Conflict with BUS_ADDR_TRIG_SYSTEM_IDENTIFICATION
 
     ###########################################################################
-    #--- Data Logger:
+    # --- Data Logger:
     ###########################################################################
     # ram_data_logger.vhd
     #
 
-    BUS_ADDR_TRIG_WRITE = DATA_LOGGER_CS + 0x1004    # writing anything to this address triggers the write mode in ram_data_logger.vhd
+    # writing anything to this address triggers the write mode in ram_data_logger.vhd
+    BUS_ADDR_TRIG_WRITE = DATA_LOGGER_CS + 0x1004
     # NOTE THAT THIS MODULE (ram_data_logger.vhd) IS IMPLEMENTED OUTSIDE OF DPLL_WRAPPER.V AND THUS IT is part of a different address mapping: this is a direct address offset in the Zynq address space, contrary to most of the other addresses here, which are multiplied by 4 by the conversion layer to avoid breaking 32 bits boundaries
 
-    MAX_SAMPLES_READ_BUFFER = 2**15 # should be equal to 2**ADDRESS_WIDTH from ram_data_logger.vhd
+    # should be equal to 2**ADDRESS_WIDTH from ram_data_logger.vhd
+    MAX_SAMPLES_READ_BUFFER = 2**15
 
     ###########################################################################
-    #--- DPLL Read:
+    # --- DPLL Read:
     ###########################################################################
     # addr_packed.vhd
     #
@@ -310,19 +320,19 @@ class RP_PLL_device():
     DPLL_READ_DEFAULT = 0xEFFFFFFF
 
     ###########################################################################
-    #--- House Keeping (HK):
+    # --- House Keeping (HK):
     ###########################################################################
     # red_pitaya_hk.v
     #
 
-    #--------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # Auxiliary Components
     #
 
     BUS_ADDR_FAN_PWR = (3 << 20) + 0x18
 
     ###########################################################################
-    #--- Analog Mixed Signals (AMS):
+    # --- Analog Mixed Signals (AMS):
     ###########################################################################
     # red_pitaya_ams.v
     #
@@ -330,7 +340,7 @@ class RP_PLL_device():
     # ...contains parameters related to the XADC and slow PWM DAC controls
 
     ###########################################################################
-    #--- VCO:
+    # --- VCO:
     ###########################################################################
     # mux_internal_vco.vhd
     #
@@ -343,18 +353,18 @@ class RP_PLL_device():
     BUS_ADDR_vco_mux = (5 << 20) + 0x00000
 
     ###########################################################################
-    #--- Initialization:
+    # --- Initialization:
     ###########################################################################
     #
 
-    def __init__(self, controller = None):
+    def __init__(self, controller=None):
         self.sock = socket_placeholder()
         self.controller = controller
         self.valid_socket = 0
         return
 
     ###########################################################################
-    #--- Red Pitaya System Commands:
+    # --- Red Pitaya System Commands:
     ###########################################################################
     #
 
@@ -364,7 +374,8 @@ class RP_PLL_device():
         self.valid_socket = 0
 
     def OpenTCPConnection(self, HOST, PORT=5000):
-        print("RP_PLL_device::OpenTCPConnection(): HOST = '%s', PORT = %d" % (HOST, PORT))
+        print("RP_PLL_device::OpenTCPConnection(): HOST = '%s', PORT = %d" %
+              (HOST, PORT))
         self.HOST = HOST
         self.PORT = PORT
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -379,7 +390,8 @@ class RP_PLL_device():
         file_data = np.fromfile(strFilenameLocal, dtype=np.uint8)
         try:
             # send header
-            packet_to_send = struct.pack('<III', self.MAGIC_BYTES_WRITE_FILE, len(strFilenameRemote), len(file_data))
+            packet_to_send = struct.pack(
+                '<III', self.MAGIC_BYTES_WRITE_FILE, len(strFilenameRemote), len(file_data))
             self.sock.sendall(packet_to_send)
             # send filename
             self.sock.sendall(strFilenameRemote.encode('ascii'))
@@ -394,7 +406,8 @@ class RP_PLL_device():
 
         try:
             # send header
-            packet_to_send = struct.pack('<III', self.MAGIC_BYTES_SHELL_COMMAND, len(strCommand), 0)
+            packet_to_send = struct.pack(
+                '<III', self.MAGIC_BYTES_SHELL_COMMAND, len(strCommand), 0)
             self.sock.sendall(packet_to_send)
             # send filename
             self.sock.sendall(strCommand.encode('ascii'))
@@ -407,18 +420,20 @@ class RP_PLL_device():
 
         try:
             # send header
-            packet_to_send = struct.pack('<III', self.MAGIC_BYTES_REBOOT_MONITOR, 0, 0)
+            packet_to_send = struct.pack(
+                '<III', self.MAGIC_BYTES_REBOOT_MONITOR, 0, 0)
             self.sock.sendall(packet_to_send)
         except:
             print("RP_PLL.py: send_reboot_command(): exception while sending command!")
             self.controller.stopCommunication()
 
     ###########################################################################
-    #--- Zynq I/O Helper Functions
+    # --- Zynq I/O Helper Functions
     ###########################################################################
     #
 
-    def dpll_read_address(self, dpll_addr_offset): #TODO: default value for uninitialized RAM is 0xEFFFFFFF...
+    # TODO: default value for uninitialized RAM is 0xEFFFFFFF...
+    def dpll_read_address(self, dpll_addr_offset):
         bus_address = self.DPLL_READ_CS + self.DPLL_MLTP*dpll_addr_offset
         return bus_address
 
@@ -431,13 +446,14 @@ class RP_PLL_device():
         buf = b''
         while count:
             newbuf = self.sock.recv(count)
-            if not newbuf: return None
+            if not newbuf:
+                return None
             buf += newbuf
             count -= len(newbuf)
         return buf
 
     ###########################################################################
-    #--- Write to Zynq Register:
+    # --- Write to Zynq Register:
     ###########################################################################
     #
 
@@ -521,19 +537,23 @@ class RP_PLL_device():
         # Parse unsigned int64 (int64) to buffer
         data_buffer = struct.pack('<Q', data_uint64)
         # Write buffer into Zynq register
-        self.write_Zynq_register_32(address_uint32_lsb, data_buffer[:4]) # LSBs
-        self.write_Zynq_register_32(address_uint32_msb, data_buffer[4:]) # MSBs
+        self.write_Zynq_register_32(
+            address_uint32_lsb, data_buffer[:4])  # LSBs
+        self.write_Zynq_register_32(
+            address_uint32_msb, data_buffer[4:])  # MSBs
 
     # Write Signed int64 Zynq Register ----------------------------------------
     def write_Zynq_register_int64(self, address_uint32_lsb, address_uint32_msb, data_int64):
         # Parse signed int64 (int64) to buffer
         data_buffer = struct.pack('<q', data_int64)
         # Write buffer into Zynq register
-        self.write_Zynq_register_32(address_uint32_lsb, data_buffer[:4]) # LSBs
-        self.write_Zynq_register_32(address_uint32_msb, data_buffer[4:]) # MSBs
+        self.write_Zynq_register_32(
+            address_uint32_lsb, data_buffer[:4])  # LSBs
+        self.write_Zynq_register_32(
+            address_uint32_msb, data_buffer[4:])  # MSBs
 
     ###########################################################################
-    #--- Read from Zynq Register:
+    # --- Read from Zynq Register:
     ###########################################################################
     #
 
@@ -554,7 +574,8 @@ class RP_PLL_device():
                                          self.RP_TOP_ADDR,
                                          number_of_points)
             self.sock.sendall(packet_to_send)
-            data_buffer = self.recvall(int(2*number_of_points)) # read number_of_points samples (16 bits each)
+            # read number_of_points samples (16 bits each)
+            data_buffer = self.recvall(int(2*number_of_points))
         except:
             print("Unexpected error when reading Zynq buffer: ",
                   sys.exc_info()[0])
@@ -661,7 +682,7 @@ class RP_PLL_device():
         return register_value
 
     #######################################################
-    #--- Legacy "Opal Kelly" API Emulation:
+    # --- Legacy "Opal Kelly" API Emulation:
     #######################################################
     # this function is now disabled because we simply implemented "triggers" differently: they are simply the update_flag of an empty, but otherwise standard parallel bus register
     # def ActivateTriggerIn(self, endpoint, value):
@@ -676,7 +697,7 @@ class RP_PLL_device():
         # for this, there would need to be two versions of the internal state, so that we can diff them and commit only the addresses that have changed
         # but its much simpler for now to just commit the change directly
 
-        #print('SetWireInValue(): TODO')
+        # print('SetWireInValue(): TODO')
 
         # the multiply by 4 is because right now the zynq code doesn't work unless reading on a 32-bits boundary, so we map the addresses to different values
         if value_16bits < 0:
@@ -691,19 +712,21 @@ class RP_PLL_device():
         # this reads a single 32-bits value from the fpga registers
         # the Opal Kelly code expected a 16-bits value, so we mask them out for compatibility
         rep = self.read_Zynq_register_uint32(4*endpoint)
-        return rep & 0xFFFF # the multiply by 4 is because right now the zynq code doesn't work unless reading on a 32-bits boundary, so we map the addresses to different values
+        return rep & 0xFFFF  # the multiply by 4 is because right now the zynq code doesn't work unless reading on a 32-bits boundary, so we map the addresses to different values
 
 
 def main():
     import matplotlib.pyplot as plt
     rp = RP_PLL_device()
     rp.OpenTCPConnection("192.168.1.100")
-    #rp.sock.sendall(struct.pack('=IHhIiIhd', 0xABCD1236, 0, -8*1024, 3, 16*1024, 5, -1, 1.0000000000000004))
+    # rp.sock.sendall(struct.pack('=IHhIiIhd', 0xABCD1236, 0, -8*1024, 3, 16*1024, 5, -1, 1.0000000000000004))
     magic_bytes_flank_servo = 0xABCD1236
     iStopAfterZC = 1    # 1 or 0 (true or false)
-    ramp_minimum = -8*1024  # -8*1024 is the minimum of the DAC output (-1V into 50 ohms)
+    # -8*1024 is the minimum of the DAC output (-1V into 50 ohms)
+    ramp_minimum = -8*1024
     number_of_ramps = 3
-    number_of_steps = 16*1024   # 16*1024 is the full span of the dac output (2 Vpp into 50 ohms)
+    # 16*1024 is the full span of the dac output (2 Vpp into 50 ohms)
+    number_of_steps = 16*1024
     max_iterations = 500000
     threshold_int16 = 2300
     ki = 1e-3
@@ -715,7 +738,8 @@ def main():
                                     max_iterations, threshold_int16, ki))
         print("after sendall, calling recvall")
         if max_iterations != 0:
-            data_buffer = rp.recvall((number_of_ramps*number_of_steps+max_iterations)*2*2)
+            data_buffer = rp.recvall(
+                (number_of_ramps*number_of_steps+max_iterations)*2*2)
             print("after recvall")
             data_np = np.fromstring(data_buffer, dtype=np.int16)
     print('before sleep')
@@ -723,8 +747,6 @@ def main():
         time.sleep(5)
     print('after sleep')
     rp.sock.close()
-
-
 
     if max_iterations != 0:
         # show data
@@ -740,19 +762,17 @@ def main():
     else:
         return 0
 
+
 def main2():
-#if 1:
+    # if 1:
     rp = RP_PLL_device()
     rp.OpenTCPConnection("192.168.2.12")
 
 #    rp.write_file_on_remote(strFilenameLocal='d:\\test_file.bin', strFilenameRemote='/opt/test_file.bin')
 
-
-
     time.sleep(3)
     print("quitting")
     return
-
 
     addr_housekeeping = 3
     addr_leds = 0x00030
@@ -788,7 +808,8 @@ def main2():
     # write some frequency
     addr_dpll = 0
     addr_ref_freq_msb = 0x8001
-    address_uint32 = (addr_dpll << 20) + addr_ref_freq_msb*4    # times 4 due to address space translation
+    address_uint32 = (addr_dpll << 20) + addr_ref_freq_msb * \
+        4    # times 4 due to address space translation
     rp.write_Zynq_register_uint32(address_uint32, 0x1000)
 
     # first trigger a write
@@ -804,7 +825,7 @@ def main2():
     data_np = np.fromstring(data_buffer, dtype=np.int16)
     print(data_np)
     for k in range(10):
-        print('%d:\t%s' % (k, hex((data_np[k])&0xFFFF)))
+        print('%d:\t%s' % (k, hex((data_np[k]) & 0xFFFF)))
 #    print hex(data_np[7])
 #    print hex(data_np[7])
 #    print hex(data_np[7])
@@ -818,12 +839,10 @@ def main2():
 
 #   return data_np
 
+
 if __name__ == '__main__':
-##    data_np = main()
+    # data_np = main()
     data_np = main2()
-
-
-
 
 
 # # Stuff for the initialization, which has to be completely re-done anyway:

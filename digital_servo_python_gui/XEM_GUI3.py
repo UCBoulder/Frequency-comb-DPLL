@@ -22,11 +22,13 @@ from DisplayDividerAndResidualsStreamingSettingsWindow import DisplayDividerAndR
 from ConfigurationRPSettingsUI import ConfigRPSettingsUI
 from devicesData import devicesData
 
+
 class Controller:
     """Main class of the GUI. It contains most of the elements of the GUI, the main_window and the communication class"""
+
     def __init__(self):
         # Create the object that handles the communication with the FPGA board:
-        self.sl = SuperLaserLand_JD_RP(controller = self)
+        self.sl = SuperLaserLand_JD_RP(controller=self)
         self.updateDeviceData()
         self.sp = SLLSystemParameters(self.sl)
 
@@ -36,7 +38,6 @@ class Controller:
             self.app = QtWidgets.QApplication(sys.argv)
 
         self.main()
-
 
     def updateDeviceData(self):
         # Hardcoded dictionnary containing the known Red Pitaya
@@ -79,13 +80,12 @@ class Controller:
     #    serial_to_color_mapping['124300046V'] = '#FF0000'
     #    serial_to_color_mapping['124300046S'] = '#0033CC'
 
-
-
     def connectionGUI(self):
         strBroadcastAddress = '132.163.182.255'
-        strFPGAFirmware=r'red_pitaya_top.bit'
-        strCPUFirmware=u'monitor-tcp'
-        self.initial_config = initialConfiguration(self.sl.dev, self, self.devices_data, strBroadcastAddress, strFPGAFirmware, strCPUFirmware)
+        strFPGAFirmware = r'red_pitaya_top.bit'
+        strCPUFirmware = u'monitor-tcp'
+        self.initial_config = initialConfiguration(
+            self.sl.dev, self, self.devices_data, strBroadcastAddress, strFPGAFirmware, strCPUFirmware)
 
     #    def __init__(self, dev, devices_data={}, strBroadcastAddress="192.168.2.255", strFPGAFirmware='', strCPUFirmware=''):
 
@@ -94,8 +94,8 @@ class Controller:
         # allowSetForegroundWindow.allowSetForegroundWindow()
         # self.initial_config.setWindowState(self.initial_config.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
     #    # this will activate the window
-    ##    self.initial_config.activateWindow()
-    ##    self.initial_config.show()
+    # self.initial_config.activateWindow()
+    # self.initial_config.show()
     #  #  self.initial_config.raise_()
     #  #  self.initial_config.show()
     #
@@ -111,62 +111,56 @@ class Controller:
     #    self.initial_config.show()
     #    self.initial_config.activateWindow()
 
-        #self.initial_config.setWindowState(self.initial_config.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
+        # self.initial_config.setWindowState(self.initial_config.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
         # Run the event loop for this window
-        #self.app.exec_()
-        #self.main()
-
+        # self.app.exec_()
+        # self.main()
 
     def main(self):
 
-
-    ############################################## - OLD CODE - ##############################################
-    # this opens the connection to the fpga (hard-coded IP address for now)
-    #    strList = self.sl.getDeviceList()
+        ############################################## - OLD CODE - ##############################################
+        # this opens the connection to the fpga (hard-coded IP address for now)
+        #    strList = self.sl.getDeviceList()
         ###########################################################################
         # Update the FPGA bitfile and the Zynq monitor-tcp C program
 
-
         # send new bitfile version
         # try:
-    #        self.sl.dev.write_file_on_remote(strFilenameLocal=r'D:\Projects\RedPitaya\fpga\project\redpitaya.runs\impl_1\red_pitaya_top.bit', strFilenameRemote='/opt/red_pitaya_top.bit')
-    #        self.sl.dev.write_file_on_remote(strFilenameLocal=r'D:\Projets_Xilinx\RedPitaya\fpga\project\redpitaya.runs\impl_1\red_pitaya_top.bit', strFilenameRemote='/opt/red_pitaya_top.bit')
+        #        self.sl.dev.write_file_on_remote(strFilenameLocal=r'D:\Projects\RedPitaya\fpga\project\redpitaya.runs\impl_1\red_pitaya_top.bit', strFilenameRemote='/opt/red_pitaya_top.bit')
+        #        self.sl.dev.write_file_on_remote(strFilenameLocal=r'D:\Projets_Xilinx\RedPitaya\fpga\project\redpitaya.runs\impl_1\red_pitaya_top.bit', strFilenameRemote='/opt/red_pitaya_top.bit')
         #     pass
         # except:
         #     print("warning, could not update fpga bitfile")
         #     pass
         # program FPGA with new bitfile:
-    #    self.sl.dev.send_shell_command('cat /opt/red_pitaya_top.bit > /dev/xdevcfg')
+        #    self.sl.dev.send_shell_command('cat /opt/red_pitaya_top.bit > /dev/xdevcfg')
 
-    #    time.sleep(3)
-    #
-    #    # send new monitor-tcp version
-    #    self.sl.dev.write_file_on_remote(strFilenameLocal=u'D:\\Université\\Dropbox\\22_H2015\\Red Pitaya\\monitor-tcp\\monitor-tcp', strFilenameRemote='/opt/monitor-tcp-new')
-    #
-    #    # set executable permissions
-    #    self.sl.dev.send_shell_command('chmod +x /opt/monitor-tcp-new')
-    #    # copy over old file
-    #    self.sl.dev.send_shell_command('mv /opt/monitor-tcp-new /opt/monitor-tcp')
-    #
-    #    # send reboot command
-    #    self.sl.dev.send_reboot_command()
-    #    self.sl.dev.sock.shutdown(socket.SHUT_RDWR)
-    #    self.sl.dev.sock.close()
-    #
-    #    time.sleep(1) # give some time for tcp server to come back up
-    ##    return
-    #    self.sl.getDeviceList() # reconnect
-    #
-    #    #self.sl.dev.OpenTCPConnection(self.sl.dev.HOST, self.sl.dev.PORT) # hack to get things working quickly
-    ##    self.sl.dev.sock.connect((self.sl.dev.HOST, self.sl.dev.PORT))
-    #
-    ##    return  # for quick debug tests
-
+        #    time.sleep(3)
+        #
+        #    # send new monitor-tcp version
+        #    self.sl.dev.write_file_on_remote(strFilenameLocal=u'D:\\Université\\Dropbox\\22_H2015\\Red Pitaya\\monitor-tcp\\monitor-tcp', strFilenameRemote='/opt/monitor-tcp-new')
+        #
+        #    # set executable permissions
+        #    self.sl.dev.send_shell_command('chmod +x /opt/monitor-tcp-new')
+        #    # copy over old file
+        #    self.sl.dev.send_shell_command('mv /opt/monitor-tcp-new /opt/monitor-tcp')
+        #
+        #    # send reboot command
+        #    self.sl.dev.send_reboot_command()
+        #    self.sl.dev.sock.shutdown(socket.SHUT_RDWR)
+        #    self.sl.dev.sock.close()
+        #
+        #    time.sleep(1) # give some time for tcp server to come back up
+        # return
+        #    self.sl.getDeviceList() # reconnect
+        #
+        #    #self.sl.dev.OpenTCPConnection(self.sl.dev.HOST, self.sl.dev.PORT) # hack to get things working quickly
+        # self.sl.dev.sock.connect((self.sl.dev.HOST, self.sl.dev.PORT))
+        #
+        # return  # for quick debug tests
 
         ############################################## - OLD CODE - ##############################################
         # Start the User Interface
-
-
 
         bTriggerEvents = False
         bConnectedRP = False
@@ -190,20 +184,16 @@ class Controller:
         #     bTriggerEvents = False
         #     bConnectedRP = False
 
-
         bUpdateFPGA = bTriggerEvents
         bSendToFPGA = bTriggerEvents
 
         ###########################################################################
         # Create the object which handles the configuration parameters (DAC offsets, DAC gains, beat frequency modulation range, etc):
-        #sp = SLLSystemParameters()
-
-
+        # sp = SLLSystemParameters()
 
     #    config_window = SLLConfigurationWindow()
     #    config_window.loadParameters(sp)
     #    config_window.hide()
-
 
         ###########################################################################
         # Load all our windows:
@@ -211,10 +201,10 @@ class Controller:
         # Style sheet which includes the color scheme for each specific box:
         try:
             # custom_style_sheet = ('#MainWindow {color: white; background-color: %s;}' % self.devices_data[self.initial_config.strSelectedSerial]['color'])
-            custom_style_sheet = ('#MainWindow {color: white; background-color: %s;}' % self.devices_data[self.strSelectedSerial]['color'])
+            custom_style_sheet = ('#MainWindow {color: white; background-color: %s;}' %
+                                  self.devices_data[self.strSelectedSerial]['color'])
         except KeyError:
             custom_style_sheet = ''
-
 
         # The shorthand name which gets added to the window names:
         try:
@@ -228,17 +218,18 @@ class Controller:
         # 200 MHz/(2*(modulus+1))
         # While for the pulsed mode (bPulses = 1), the frequency is:
         # 200 MHz/(modulus+1)
-        self.divider_settings_window = DisplayDividerAndResidualsStreamingSettingsWindow(self.sl, self.sp, clk_divider_modulus=67e3, bDividerOn=0, bPulses=0, custom_style_sheet=custom_style_sheet, custom_shorthand=custom_shorthand)
-
+        self.divider_settings_window = DisplayDividerAndResidualsStreamingSettingsWindow(
+            self.sl, self.sp, clk_divider_modulus=67e3, bDividerOn=0, bPulses=0, custom_style_sheet=custom_style_sheet, custom_shorthand=custom_shorthand)
 
         # Optical lock window
         # self.xem_gui_mainwindow2 = XEM_GUI_MainWindow(self.sl, custom_shorthand + ': Optical lock', 1, (False, True, False), sp, custom_style_sheet, self.initial_config.strSelectedSerial, bUpdateFPGA = bSendToFPGA, bConnectedRP = bConnectedRP)
-        self.xem_gui_mainwindow2 = XEM_GUI_MainWindow(self.sl, custom_shorthand + ': Optical lock', 1, (False, True, False), self.sp, custom_style_sheet, self.strSelectedSerial)
+        self.xem_gui_mainwindow2 = XEM_GUI_MainWindow(
+            self.sl, custom_shorthand + ': Optical lock', 1, (False, True, False), self.sp, custom_style_sheet, self.strSelectedSerial)
 
         # CEO Lock window
         # self.xem_gui_mainwindow = XEM_GUI_MainWindow(self.sl, custom_shorthand + ': CEO lock', 0, (True, False, False), sp, custom_style_sheet, self.initial_config.strSelectedSerial, bUpdateFPGA = bSendToFPGA, bConnectedRP = bConnectedRP)
-        self.xem_gui_mainwindow = XEM_GUI_MainWindow(self.sl, custom_shorthand + ': CEO lock', 0, (True, False, False), self.sp, custom_style_sheet, self.strSelectedSerial)
-
+        self.xem_gui_mainwindow = XEM_GUI_MainWindow(
+            self.sl, custom_shorthand + ': CEO lock', 0, (True, False, False), self.sp, custom_style_sheet, self.strSelectedSerial)
 
     #    ###########################################################################
     #    # For testing the Red Pitaya with the built-in DDS:
@@ -249,10 +240,10 @@ class Controller:
     #    addr_vco_freq_lsb  = 0x0008
     #
     #    vco_amplitude = round(0.01*(2**15-1))
-    ##   vco_freq_word = np.array([round((15e6/100e6+1./600.)*2.**48)]).astype(np.int64)
-    ##   # break vco word into msbs and lsbs:
-    ##   vco_freq_word_msbs = vco_freq_word >> 32
-    ##   vco_freq_word_lsbs = np.bitwise_and(vco_freq_word, (1<<32)-1)
+    # vco_freq_word = np.array([round((15e6/100e6+1./600.)*2.**48)]).astype(np.int64)
+    # break vco word into msbs and lsbs:
+    # vco_freq_word_msbs = vco_freq_word >> 32
+    # vco_freq_word_lsbs = np.bitwise_and(vco_freq_word, (1<<32)-1)
     #
     #   # write amplitude
     #    address_uint32 = (addr_vco << 20) + addr_vco_amplitude
@@ -269,13 +260,14 @@ class Controller:
         except:
             temp_control_port = 0
 
-
         strNameTemplate = r'data_logging\%s' % strOfTime
         # strNameTemplate = '%s_%s_' % (strNameTemplate, self.initial_config.strSelectedSerial)
 #        strNameTemplate = '%s_%s_' % (strNameTemplate, self.strSelectedSerial)
         self.strNameTemplate = strNameTemplate
-        self.freq_error_window1 = FreqErrorWindowWithTempControlV2(self.sl, 'CEO beat in-loop counter', self.sp, 0, strNameTemplate, custom_style_sheet, 0, self.xem_gui_mainwindow)
-        self.freq_error_window2 = FreqErrorWindowWithTempControlV2(self.sl, 'Optical beat in-loop counter', self.sp, 1, strNameTemplate, custom_style_sheet, temp_control_port, self.xem_gui_mainwindow2)
+        self.freq_error_window1 = FreqErrorWindowWithTempControlV2(
+            self.sl, 'CEO beat in-loop counter', self.sp, 0, strNameTemplate, custom_style_sheet, 0, self.xem_gui_mainwindow)
+        self.freq_error_window2 = FreqErrorWindowWithTempControlV2(
+            self.sl, 'Optical beat in-loop counter', self.sp, 1, strNameTemplate, custom_style_sheet, temp_control_port, self.xem_gui_mainwindow2)
 
         self.counters_window = QtWidgets.QWidget()
         self.counters_window.setObjectName('MainWindow')
@@ -284,19 +276,23 @@ class Controller:
         vbox.addWidget(self.freq_error_window1)
         vbox.addWidget(self.freq_error_window2)
         self.counters_window.setLayout(vbox)
-        self.counters_window.setWindowTitle(custom_shorthand + ': Frequency counters')
-        #self.counters_window.setGeometry(993, 40, 800, 1010)
-        #self.counters_window.setGeometry(0, 0, 750, 1000)
+        self.counters_window.setWindowTitle(
+            custom_shorthand + ': Frequency counters')
+        # self.counters_window.setGeometry(993, 40, 800, 1010)
+        # self.counters_window.setGeometry(0, 0, 750, 1000)
         #    self.counters_window.resize(600, 1080-100+30)
-        #self.counters_window.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(985, 10))
-        #self.counters_window.show()
+        # self.counters_window.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(985, 10))
+        # self.counters_window.show()
 
         # Dither windows, this code could be moved to another class/file to help with clutter:
-        self.dither_widget0 = DisplayDitherSettingsWindow(self.sl, self.sp, 0, modulation_frequency_in_hz=1e3, output_amplitude=1e-3, integration_time_in_seconds=0.1, bEnableDither=True, custom_style_sheet=custom_style_sheet)
-        self.dither_widget1 = DisplayDitherSettingsWindow(self.sl, self.sp, 1, modulation_frequency_in_hz=5.1e3 , output_amplitude=1e-3, integration_time_in_seconds=0.1, bEnableDither=True, custom_style_sheet=custom_style_sheet)
-        #dither_widget2 = DisplayDitherSettingsWindow(self.sl, self.sp, 2, modulation_frequency_in_hz='110' , output_amplitude='1e-4', integration_time_in_seconds='0.1', bEnableDither=True, custom_style_sheet=custom_style_sheet)
+        self.dither_widget0 = DisplayDitherSettingsWindow(self.sl, self.sp, 0, modulation_frequency_in_hz=1e3, output_amplitude=1e-3,
+                                                          integration_time_in_seconds=0.1, bEnableDither=True, custom_style_sheet=custom_style_sheet)
+        self.dither_widget1 = DisplayDitherSettingsWindow(self.sl, self.sp, 1, modulation_frequency_in_hz=5.1e3,
+                                                          output_amplitude=1e-3, integration_time_in_seconds=0.1, bEnableDither=True, custom_style_sheet=custom_style_sheet)
+        # dither_widget2 = DisplayDitherSettingsWindow(self.sl, self.sp, 2, modulation_frequency_in_hz='110' , output_amplitude='1e-4', integration_time_in_seconds='0.1', bEnableDither=True, custom_style_sheet=custom_style_sheet)
 
-        self.RP_Settings = ConfigRPSettingsUI(self.sl, self.sp, self, custom_style_sheet=custom_style_sheet, custom_shorthand=custom_shorthand)
+        self.RP_Settings = ConfigRPSettingsUI(
+            self.sl, self.sp, self, custom_style_sheet=custom_style_sheet, custom_shorthand=custom_shorthand)
 
         self.settings_window = QtWidgets.QWidget()
         self.settings_window.setObjectName('MainWindow')
@@ -304,7 +300,7 @@ class Controller:
         vbox1 = QtWidgets.QVBoxLayout()
         vbox1.addWidget(self.dither_widget0)
         vbox1.addWidget(self.dither_widget1)
-        #vbox1.addWidget(dither_widget2)
+        # vbox1.addWidget(dither_widget2)
         vbox1.addStretch(1)
         vbox2 = QtWidgets.QVBoxLayout()
         vbox2.addWidget(self.RP_Settings)
@@ -314,8 +310,9 @@ class Controller:
         hbox.addLayout(vbox2)
         hbox.addStretch(1)
         self.settings_window.setLayout(hbox)
-        self.settings_window.setWindowTitle(custom_shorthand + ': Dither controls')
-        #self.settings_window.show()
+        self.settings_window.setWindowTitle(
+            custom_shorthand + ': Dither controls')
+        # self.settings_window.show()
 
     #    ###########################################################################
     #    # For testing out the transfer function window:
@@ -330,7 +327,6 @@ class Controller:
         self.main_windows = QtWidgets.QWidget()
         self.main_windows.setObjectName('MainWindow')
         self.main_windows.setStyleSheet(custom_style_sheet)
-
 
         tabs = QtWidgets.QTabWidget()
         # self.xem_gui_mainwindow2.resize(600, 700)
@@ -348,7 +344,7 @@ class Controller:
         # self.divider_settings_window.setContentsMargins(0, 0, 0, 0)
         # self.divider_settings_window.layout().setContentsMargins(0, 0, 0, 0)
 
-        #tabs.setMaximumSize(1920,1080-100+30)
+        # tabs.setMaximumSize(1920,1080-100+30)
 
         # self.main_windows.setMaximumSize(600,600)
         # self.xem_gui_mainwindow.setMaximumSize(600,600)
@@ -362,32 +358,29 @@ class Controller:
         tabs.addTab(self.xem_gui_mainwindow2, "Slow Lock")
         tabs.addTab(self.counters_window, "Counters")
         tabs.addTab(self.settings_window, "Settings")
-        #FEATURE
-        #tabs.addTab(dfr_timing_gui, "DFr trigger generator")
-        #tabs.addTab(self.divider_settings_window, "Filter settings")
+        # FEATURE
+        # tabs.addTab(dfr_timing_gui, "DFr trigger generator")
+        # tabs.addTab(self.divider_settings_window, "Filter settings")
         # tabs.setGeometry(0, 0, 750, 1000)
-
-
 
         box = QtWidgets.QHBoxLayout()
         box.addWidget(tabs)
         self.main_windows.setLayout(box)
         self.main_windows.setWindowTitle(custom_shorthand)
-        #self.main_windows.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(945-300, 0))
-        self.main_windows.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + QtCore.QPoint(800-300, 0))
+        # self.main_windows.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(945-300, 0))
+        self.main_windows.move(QtWidgets.QDesktopWidget(
+        ).availableGeometry().topLeft() + QtCore.QPoint(800-300, 0))
 
         self.main_windows.show()
-
 
         self.connectionGUI()
 
         # Enter main event loop
-        #self.app.exec_()
+        # self.app.exec_()
         try:
             self.app.exec_()
         except:
             print("XEM_GUI3.py: Exception during app.exec_()")
-
 
     def loadDefaultValueFromConfigFile(self, strSelectedSerial):
         try:
@@ -399,7 +392,8 @@ class Controller:
             strFileDefaultConfig = 'system_parameters_RP_Default.xml'
             # print('Warning: Could not parse config file for FPGA serial: %s, loading values from file %s' % (self.initial_config.strSelectedSerial, strFileDefaultConfig))
             # print('Warning: Could not parse config file for FPGA serial: %s, loading values from file %s' % (self.initial_config.strSelectedSerial, strFileDefaultConfig))
-            print('Warning: Could not parse config file for FPGA serial: %s, loading values from file %s' % (strSelectedSerial, strFileDefaultConfig))
+            print('Warning: Could not parse config file for FPGA serial: %s, loading values from file %s' % (
+                strSelectedSerial, strFileDefaultConfig))
             custom_config_file = ''
             try:
                 self.sp.loadFromFile(strFileDefaultConfig)
@@ -407,7 +401,8 @@ class Controller:
             except (KeyError, IOError):
 
                 # print('Warning: Could not parse config file "%s" for FPGA serial: %s, falling back on script-defined defaults' % (strFileDefaultConfig, self.initial_config.strSelectedSerial))
-                print('Warning: Could not parse config file "%s" for FPGA serial: %s, falling back on script-defined defaults' % (strFileDefaultConfig, strSelectedSerial))
+                print('Warning: Could not parse config file "%s" for FPGA serial: %s, falling back on script-defined defaults' %
+                      (strFileDefaultConfig, strSelectedSerial))
                 self.sp.loadDefaults()
 
         # self.sp.loadDefaults()
@@ -415,12 +410,12 @@ class Controller:
 
         self.sp.sendToFPGA(True)
 
-
     def setCustomStyleSheet(self, strSelectedSerial):
         # Style sheet which includes the color scheme for each specific box:
         try:
             # custom_style_sheet = ('#MainWindow {color: white; background-color: %s;}' % self.devices_data[self.initial_config.strSelectedSerial]['color'])
-            custom_style_sheet = ('#MainWindow {color: white; background-color: %s;}' % self.devices_data[strSelectedSerial]['color'])
+            custom_style_sheet = (
+                '#MainWindow {color: white; background-color: %s;}' % self.devices_data[strSelectedSerial]['color'])
         except KeyError:
             custom_style_sheet = ''
 
@@ -437,12 +432,12 @@ class Controller:
         self.main_windows.setStyleSheet(custom_style_sheet)
 
     def setOutputFileNames(self, MACNameTemplate):
-#        print("MAC Address: %s" % MACNameTemplate)
+        #        print("MAC Address: %s" % MACNameTemplate)
         strNameTemplate = '%s_%s_' % (self.strNameTemplate, MACNameTemplate)
         self.freq_error_window1.setNameTemplate(strNameTemplate)
         self.freq_error_window2.setNameTemplate(strNameTemplate)
 
-    def pushDefaultValues(self, strSelectedSerial = "000000000000", ip_addr = "192.168.0.150"):
+    def pushDefaultValues(self, strSelectedSerial="000000000000", ip_addr="192.168.0.150"):
         self.setCustomStyleSheet(strSelectedSerial)
 
         if self.sl.dev.valid_socket:
@@ -453,7 +448,6 @@ class Controller:
         self.sl.reset_front_end()
         self.loadDefaultValueFromConfigFile(strSelectedSerial)
 
-
         self.xem_gui_mainwindow2.pushDefaultValues()
         self.xem_gui_mainwindow.pushDefaultValues()
         self.freq_error_window1.pushDefaultValues()
@@ -463,21 +457,19 @@ class Controller:
         self.dither_widget0.pushDefaultValues()
         self.dither_widget1.pushDefaultValues()
 
-    def pushActualValues(self, strSelectedSerial, ip_addr = "192.168.0.150"):
+    def pushActualValues(self, strSelectedSerial, ip_addr="192.168.0.150"):
         self.setCustomStyleSheet(strSelectedSerial)
 
         if self.sl.dev.valid_socket:
             self.sl.dev.CloseTCPConnection()
         self.sl.dev.OpenTCPConnection(ip_addr)
 
-
-
         self.xem_gui_mainwindow2.pushActualValues()
         self.xem_gui_mainwindow.pushActualValues()
         self.freq_error_window1.pushValues()
         self.freq_error_window2.pushValues()
 
-    def getActualValues(self, strSelectedSerial, ip_addr = "192.168.0.150"):
+    def getActualValues(self, strSelectedSerial, ip_addr="192.168.0.150"):
         self.setCustomStyleSheet(strSelectedSerial)
         if self.sl.dev.valid_socket:
             self.sl.dev.CloseTCPConnection()
@@ -497,16 +489,21 @@ class Controller:
 
         strFilename = self.xem_gui_mainwindow.qedit_export_json.text()
         print(strFilename)
-        
-        window1_outs = self.xem_gui_mainwindow.retrieveValues() # DAC offset, VCO gain, dac low limit, dac high limit, reference frequency, dac_limited, kp, fi, fii, fd, fdf, chkKp, chkKd, chkLock, chkKpCrossing
+
+        # DAC offset, VCO gain, dac low limit, dac high limit, reference frequency, dac_limited, kp, fi, fii, fd, fdf, chkKp, chkKd, chkLock, chkKpCrossing
+        window1_outs = self.xem_gui_mainwindow.retrieveValues()
         window2_outs = self.xem_gui_mainwindow2.retrieveValues()
-        freq_window1_outs = self.freq_error_window1.retrieveValues() # boolean for triangular averaging
+        # boolean for triangular averaging
+        freq_window1_outs = self.freq_error_window1.retrieveValues()
         freq_window2_outs = self.freq_error_window2.retrieveValues()
-        dither1_outs = self.dither_widget0.retrieveValues() # modulation_freq, amplitude, integration_time_in_seconds, mode
+        # modulation_freq, amplitude, integration_time_in_seconds, mode
+        dither1_outs = self.dither_widget0.retrieveValues()
         dither2_outs = self.dither_widget1.retrieveValues()
-        rp_settings_outs = self.RP_Settings.retrieveValues() # VCO_connection, fan_state, PLL1_connection, VCO_amplitude, VCO_offset
-        divider_settings_outs = self.divider_settings_window.retrieveValues() # filter_select_0, filter_select_1, angle_select_0, angle_select_1
-    
+        # VCO_connection, fan_state, PLL1_connection, VCO_amplitude, VCO_offset
+        rp_settings_outs = self.RP_Settings.retrieveValues()
+        # filter_select_0, filter_select_1, angle_select_0, angle_select_1
+        divider_settings_outs = self.divider_settings_window.retrieveValues()
+
 #        print(window1_outs)
         settings_to_save = {}
         settings_to_save['window1_outs'] = window1_outs
@@ -517,15 +514,16 @@ class Controller:
         settings_to_save['dither2_outs'] = dither2_outs
         settings_to_save['rp_settings_outs'] = rp_settings_outs
         settings_to_save['divider_settings_outs'] = divider_settings_outs
-        
+
         self.sp.Writejson(strFilename, settings_to_save)
-    
+
     def setValues(self):
         strFilename = self.xem_gui_mainwindow.qedit_import_settings.text()
         print(strFilename)
         self.sl.reset_front_end()
-        self.sp.loadFromFile(strFilename) # Write values into system parameters
-        
+        # Write values into system parameters
+        self.sp.loadFromFile(strFilename)
+
         # Load values to respective windows and programs:
         self.xem_gui_mainwindow2.pushDefaultValues()
         self.xem_gui_mainwindow.pushDefaultValues()
@@ -535,10 +533,10 @@ class Controller:
         self.divider_settings_window.pushDefaultValues()
         self.dither_widget0.pushDefaultValues()
         self.dither_widget1.pushDefaultValues()
-        
+
     def sendFreqError(self):
         return self.freq_error_window1.freq_history[self.freq_error_window1.bValid_counters]
-    
+
     def stopCommunication(self):
         if self.sl.dev.valid_socket:
             self.sl.dev.CloseTCPConnection()
@@ -550,7 +548,7 @@ class Controller:
         except:
             print("Error while killing the Timers")
 
-    def startCommunication(self, ip_addr = "192.168.0.150"):
+    def startCommunication(self, ip_addr="192.168.0.150"):
         self.sl.dev.OpenTCPConnection(ip_addr)
         self.xem_gui_mainwindow2.startTimers()
         self.xem_gui_mainwindow.startTimers()
@@ -558,7 +556,5 @@ class Controller:
         self.freq_error_window2.startTimers()
 
 
-
 if __name__ == '__main__':
     Controller()
-

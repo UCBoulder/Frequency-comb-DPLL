@@ -7,18 +7,16 @@ Created on Fri Aug 26 00:26:50 2016
 from __future__ import print_function
 
 import sys
-from PyQt5 import QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-#import numpy as np
+from PyQt5 import QtWidgets
+import time
+import socket
+
+# needed to update FPGA firmware and CPU (Zynq) software
+from RP_PLL import RP_PLL_device
 import UDPRedPitayaDiscovery
 
-import time
 
-from RP_PLL import RP_PLL_device # needed to update FPGA firmware and CPU (Zynq) software
-import socket
 class initialConfiguration(QtWidgets.QDialog):
-
-
 
     def __init__(self, dev, controller, devices_data={}, strBroadcastAddress="192.168.1.255", strFPGAFirmware='', strCPUFirmware=''):
         super(initialConfiguration, self).__init__()
@@ -33,7 +31,6 @@ class initialConfiguration(QtWidgets.QDialog):
         # we gather all RP data (IP, MAC, item index) tuples in this list:
         self.strSerialList = []
 
-
         # these are used as a form of "return values" of this dialog:
         self.bOk = False
         self.bSendDefaultValues = False
@@ -43,7 +40,8 @@ class initialConfiguration(QtWidgets.QDialog):
         self.controller = controller
 
         # create the UDP discovery object:
-        self.udp_discovery = UDPRedPitayaDiscovery.UDPRedPitayaDiscovery(self.strBroadcastAddress)
+        self.udp_discovery = UDPRedPitayaDiscovery.UDPRedPitayaDiscovery(
+            self.strBroadcastAddress)
         self.reset_list_and_send_broadcast()
         self.timerID = self.startTimer(int(100))
 
@@ -52,8 +50,6 @@ class initialConfiguration(QtWidgets.QDialog):
 #        print 'after check_answers'
         self.initUI()
 
-
-
     def initUI(self):
         # init the UI
         self.qlabel_serial = QtWidgets.QLabel('Connected FPGAs')
@@ -61,22 +57,28 @@ class initialConfiguration(QtWidgets.QDialog):
         self.qlabel_firmware = QtWidgets.QLabel('FPGA Firmware file')
         self.qlabel_software = QtWidgets.QLabel('CPU Software file')
         self.qcombo_serial = QtWidgets.QComboBox()
-        self.qcombo_serial.setMinimumContentsLength(100)    # I can't figure out how to make it scale correctly with content so we'll make it big enough...
-        self.qcombo_serial.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToMinimumContentsLength)
+        # I can't figure out how to make it scale correctly with content so we'll make it big enough...
+        self.qcombo_serial.setMinimumContentsLength(100)
+        self.qcombo_serial.setSizeAdjustPolicy(
+            QtWidgets.QComboBox.AdjustToMinimumContentsLength)
 
         self.qedit_broadcast = QtWidgets.QLineEdit(self.strBroadcastAddress)
         self.qedit_firmware = QtWidgets.QLineEdit(self.strFPGAFirmware)
         self.qedit_software = QtWidgets.QLineEdit(self.strCPUFirmware)
 
-        self.qbtn_send_broadcast = QtWidgets.QPushButton('Broadcast discovery packet')
-        self.qbtn_reprogram_fpga = QtWidgets.QPushButton('Update FPGA firmware')
+        self.qbtn_send_broadcast = QtWidgets.QPushButton(
+            'Broadcast discovery packet')
+        self.qbtn_reprogram_fpga = QtWidgets.QPushButton(
+            'Update FPGA firmware')
         self.qbtn_reprogram_cpu = QtWidgets.QPushButton('Update CPU software')
-        self.qbtn_send_broadcast.clicked.connect(self.reset_list_and_send_broadcast)
+        self.qbtn_send_broadcast.clicked.connect(
+            self.reset_list_and_send_broadcast)
         self.qbtn_reprogram_fpga.clicked.connect(self.programFPGAClicked)
         self.qbtn_reprogram_cpu.clicked.connect(self.programCPUClicked)
 
         self.qradio_reprogram = QtWidgets.QRadioButton('Send default values')
-        self.qradio_noreprogram = QtWidgets.QRadioButton('Connect to an already running box (NOT WORKING YET)')
+        self.qradio_noreprogram = QtWidgets.QRadioButton(
+            'Connect to an already running box (NOT WORKING YET)')
         self.qradio_reprogram.setChecked(True)
 
         self.qradio_noreprogram.setDisabled(True)
@@ -93,19 +95,14 @@ class initialConfiguration(QtWidgets.QDialog):
         # btn_group2.addButton(self.qradio_usefromtextbox)
         # btn_group2.setId(self.qradio_usefromtextbox, 1)
 
-
-
         self.qbtn_yes = QtWidgets.QPushButton('OK')
         self.qbtn_no = QtWidgets.QPushButton('Cancel')
 
         self.qbtn_yes.clicked.connect(self.okClicked)
         self.qbtn_no.clicked.connect(self.cancelClicked)
 
-
         self.qgroupbox_IP_addr = QtWidgets.QGroupBox('IP Address')
         gridIP = QtWidgets.QGridLayout()
-
-
 
         self.qradio_usefromlist = QtWidgets.QRadioButton('Use listed')
         self.qradio_usefromtextbox = QtWidgets.QRadioButton('Use manual entry')
@@ -115,12 +112,9 @@ class initialConfiguration(QtWidgets.QDialog):
         self.qlabel_manual_entry = QtWidgets.QLabel('Manual IP entry')
         self.qedit_manual_entry = QtWidgets.QLineEdit('192.168.1.11')
 
-
         gridIP.addWidget(self.qradio_usefromtextbox, 0, 0)
         gridIP.addWidget(self.qlabel_manual_entry, 0, 1)
         gridIP.addWidget(self.qedit_manual_entry, 0, 2)
-
-
 
         gridIP.addWidget(self.qradio_usefromlist, 1, 0)
         gridIP.addWidget(self.qlabel_serial, 1, 1)
@@ -132,13 +126,16 @@ class initialConfiguration(QtWidgets.QDialog):
 
         self.qgroupbox_IP_addr.setLayout(gridIP)
 
-
-        self.qgroupbox_connection = QtWidgets.QGroupBox('Red Pitaya Connection')
+        self.qgroupbox_connection = QtWidgets.QGroupBox(
+            'Red Pitaya Connection')
         gridConnection = QtWidgets.QGridLayout()
 
-        self.qradio_pushValue = QtWidgets.QRadioButton('Push default values to Red Pitaya')
-        self.qradio_existingRP = QtWidgets.QRadioButton('Reconnect to an already running Red Pitaya')
-        self.qradio_noRP = QtWidgets.QRadioButton('Open the GUI without any Red Pitaya')
+        self.qradio_pushValue = QtWidgets.QRadioButton(
+            'Push default values to Red Pitaya')
+        self.qradio_existingRP = QtWidgets.QRadioButton(
+            'Reconnect to an already running Red Pitaya')
+        self.qradio_noRP = QtWidgets.QRadioButton(
+            'Open the GUI without any Red Pitaya')
         self.qradio_existingRP.setChecked(True)
 
         gridConnection.addWidget(self.qradio_pushValue,        0, 0)
@@ -184,7 +181,6 @@ class initialConfiguration(QtWidgets.QDialog):
         hbox.addWidget(self.qbtn_no)
         grid.addLayout(hbox, 5, 0, 1, 3)
 
-
         self.setLayout(grid)
         self.setWindowTitle('Initial configuration')
         self.qbtn_yes.setFocus()
@@ -212,8 +208,8 @@ class initialConfiguration(QtWidgets.QDialog):
     def MAC_to_display_string(self, strMAC, strIP):
         # build the string that we will display to the user in the combo box:
         strDisplay = ''
-        #print('MAC_to_display_string: %s, %s' % (strMAC, strIP))
-        #print(self.devices_data)
+        # print('MAC_to_display_string: %s, %s' % (strMAC, strIP))
+        # print(self.devices_data)
 
         try:
             box_name = self.devices_data[strMAC.replace(':', '')]['name']
@@ -227,7 +223,8 @@ class initialConfiguration(QtWidgets.QDialog):
             box_color = ''
             pass
 
-        strDisplay = 'Name = %s, IP = %s, MAC = %s, Color = %s' % (box_name, strIP, strMAC, box_color)
+        strDisplay = 'Name = %s, IP = %s, MAC = %s, Color = %s' % (
+            box_name, strIP, strMAC, box_color)
         return strDisplay
 
     def timerEvent(self, e):
@@ -260,15 +257,18 @@ class initialConfiguration(QtWidgets.QDialog):
         if self.qradio_usefromlist.isChecked():
             print("using list")
             try:
-                (strIP, strMAC) = self.strSerialList[self.qcombo_serial.currentIndex()]
+                (strIP,
+                 strMAC) = self.strSerialList[self.qcombo_serial.currentIndex()]
 #                self.strName = devices_data[1]['name']
-                self.strSelectedSerial = strMAC.replace(':', '') # this is just for legacy compatibility, when we had actual serial numbers
-                self.strSelectedName = str(self.devices_data[self.strSelectedSerial]['name']) # Jonah edit. For output file organization.
+                # this is just for legacy compatibility, when we had actual serial numbers
+                self.strSelectedSerial = strMAC.replace(':', '')
+                # Jonah edit. For output file organization.
+                self.strSelectedName = str(
+                    self.devices_data[self.strSelectedSerial]['name'])
                 self.strSelectedMAC = strMAC
                 self.strSelectedIP = strIP
                 print(strMAC)
                 print(strIP)
-
 
             except IndexError:
                 # nothing bad happened, we probably simply had an empty list
@@ -278,7 +278,7 @@ class initialConfiguration(QtWidgets.QDialog):
         else:
             # use manual entry IP address
             # we don't have a good way of populating the MAC and serial number yet using this manual connection
-            
+
             print("using manual entry")
             self.strSelectedIP = str(self.qedit_manual_entry.text())
             # TODO read name and MAC address
@@ -289,47 +289,52 @@ class initialConfiguration(QtWidgets.QDialog):
         self.bOk = True
         self.bContinue = True
 
-        self.strFPGAFirmware = (self.qedit_firmware.text())  # the str() is to convert the QString to a normal Python string object
-        self.strCPUFirmware  = (self.qedit_software.text())  # the str() is to convert the QString to a normal Python string object
+        # the str() is to convert the QString to a normal Python string object
+        self.strFPGAFirmware = (self.qedit_firmware.text())
+        # the str() is to convert the QString to a normal Python string object
+        self.strCPUFirmware = (self.qedit_software.text())
 
-
-        self.bSendDefaultValues  = self.qradio_reprogram.isChecked()
+        self.bSendDefaultValues = self.qradio_reprogram.isChecked()
 #        self.bExternalClock = self.qradio_clk_external.isChecked()
 
-        #print(self.strSelectedIP)
+        # print(self.strSelectedIP)
 
-        if self.qradio_pushValue.isChecked() :
+        if self.qradio_pushValue.isChecked():
             # connect to the selected RedPitaya.
             self.readSelectedFPGA()
             if not self.strSelectedIP:
                 return
-            #self.dev.OpenTCPConnection(self.strSelectedIP)
-            #print("About to connect")
-            self.controller.pushDefaultValues(self.strSelectedSerial, self.strSelectedIP)
+            # self.dev.OpenTCPConnection(self.strSelectedIP)
+            # print("About to connect")
+            self.controller.pushDefaultValues(
+                self.strSelectedSerial, self.strSelectedIP)
 
         elif self.qradio_existingRP.isChecked():
             # Reconnect to the selected RedPitaya.
             self.readSelectedFPGA()
             if not self.strSelectedIP:
                 return
-            #print("About to reconnect")
-            self.controller.getActualValues(self.strSelectedSerial, self.strSelectedIP)
+            # print("About to reconnect")
+            self.controller.getActualValues(
+                self.strSelectedSerial, self.strSelectedIP)
 
         elif self.qradio_noRP.isChecked():
             # Open the GUI without any RP
-            print("WARNING! The socket has been replaced with a fake one, there might be some problems.")
+            print(
+                "WARNING! The socket has been replaced with a fake one, there might be some problems.")
             # We write fake info to allow connection
             # strMAC = "00:00:00:00:00:00"
             # self.strSelectedMAC = strMAC
             # self.strSelectedSerial = strMAC.replace(':', '') # this is just for legacy compatibility, when we had actual serial numbers
             # self.strSelectedIP = "192.168.0.150"
-            self.controller.stopCommunication() #Call the function which kill the timers and call the fake socket
-
+            # Call the function which kill the timers and call the fake socket
+            self.controller.stopCommunication()
 
         # close UDP discovery server:
-        self.killTimer(self.timerID)    # is it guaranteed that no timerEvent will be called after this line? because we delete our reference to udp_discovery, which is used in the timer event
+        # is it guaranteed that no timerEvent will be called after this line? because we delete our reference to udp_discovery, which is used in the timer event
+        self.killTimer(self.timerID)
         del self.udp_discovery
-        
+
         # Have controller update data logging names to identify RP by MAC address
 #        print(self.devices_data)
 #        self.devices_data[strMAC.replace(':', '')]['name']
@@ -338,9 +343,9 @@ class initialConfiguration(QtWidgets.QDialog):
         self.controller.setOutputFileNames(self.strSelectedName)
 
         self.close()
-        #self.controller.pushDefaultValues(self.strSelectedIP)
+        # self.controller.pushDefaultValues(self.strSelectedIP)
 
-        #self.controller.main()
+        # self.controller.main()
 
     def programFPGAClicked(self):
         self.readSelectedFPGA()
@@ -350,16 +355,17 @@ class initialConfiguration(QtWidgets.QDialog):
 
         # connect to the selected RedPitaya, send new bitfile, then send programming command to the shell:
         self.dev.OpenTCPConnection(self.strSelectedIP)
-        self.dev.write_file_on_remote(strFilenameLocal=str(self.qedit_firmware.text()), strFilenameRemote='/opt/red_pitaya_top.bit')
+        self.dev.write_file_on_remote(strFilenameLocal=str(
+            self.qedit_firmware.text()), strFilenameRemote='/opt/red_pitaya_top.bit')
         print("File written to remote host at /opt/red_pitaya_top.bit.")
-        self.dev.send_shell_command('cat /opt/red_pitaya_top.bit > /dev/xdevcfg')
+        self.dev.send_shell_command(
+            'cat /opt/red_pitaya_top.bit > /dev/xdevcfg')
         print("Program FPGA firmware command sent.")
 
         # disconnect:
         self.dev.sock.shutdown(socket.SHUT_RDWR)
         self.dev.sock.close()
         print("Disconnected from remote host.  You can now reconnect to the updated host.")
-
 
     def programCPUClicked(self):
         self.readSelectedFPGA()
@@ -370,7 +376,8 @@ class initialConfiguration(QtWidgets.QDialog):
         # connect to the selected RedPitaya
         self.dev.OpenTCPConnection(self.strSelectedIP)
         # send new monitor-tcp version
-        self.dev.write_file_on_remote(strFilenameLocal=self.qedit_software.text(), strFilenameRemote='/opt/monitor-tcp-new')
+        self.dev.write_file_on_remote(strFilenameLocal=self.qedit_software.text(
+        ), strFilenameRemote='/opt/monitor-tcp-new')
 
         # set executable permissions
         self.dev.send_shell_command('chmod +x /opt/monitor-tcp-new')
@@ -382,13 +389,14 @@ class initialConfiguration(QtWidgets.QDialog):
         self.dev.sock.shutdown(socket.SHUT_RDWR)
         self.dev.sock.close()
 
-        time.sleep(1) # give some time for tcp server to come back up
+        time.sleep(1)  # give some time for tcp server to come back up
         pass
 
     def cancelClicked(self):
         self.bOk = False
         # close UDP discovery server:
-        self.killTimer(self.timerID)    # is it guaranteed that no timerEvent will be called after this line? because we delete our reference to udp_discovery, which is used in the timer event
+        # is it guaranteed that no timerEvent will be called after this line? because we delete our reference to udp_discovery, which is used in the timer event
+        self.killTimer(self.timerID)
         del self.udp_discovery
 
         self.close()
@@ -398,18 +406,17 @@ class initialConfiguration(QtWidgets.QDialog):
         try:
             del self.udp_discovery
         except AttributeError:
-            pass # udp_discovery has already been deleted
+            pass  # udp_discovery has already been deleted
         return
+
 
 def main():
 
     ###########################################################################
     # Start the User Interface
 
-
     # Start Qt:
     app = QtWidgets.QApplication(sys.argv)
-
 
     # Load a first window which asks the user a question
     # Specify the mapping between the MAC addresses (which are used as a form of serial numbers) and the box data
@@ -418,13 +425,14 @@ def main():
                         'name': 'Red Pitaya 1',
                         'shorthand': 'RP 1',
                         'config file': 'system_parameters_RP_1.xml',
-                        #'port': 60002
+                        # 'port': 60002
                         }
 
-    strFPGAFirmware=r'D:\Projects\RedPitaya\fpga\project\redpitaya.runs\impl_1\red_pitaya_top.bit'
-    strCPUFirmware=u'D:\\Université\\Dropbox\\22_H2015\\Red Pitaya\\monitor-tcp\\monitor-tcp'
+    strFPGAFirmware = r'D:\Projects\RedPitaya\fpga\project\redpitaya.runs\impl_1\red_pitaya_top.bit'
+    strCPUFirmware = u'D:\\Université\\Dropbox\\22_H2015\\Red Pitaya\\monitor-tcp\\monitor-tcp'
     dev = RP_PLL_device()
-    initial_config = initialConfiguration(dev, devices_data=devices_data, strFPGAFirmware=strFPGAFirmware, strCPUFirmware=strCPUFirmware)
+    initial_config = initialConfiguration(
+        dev, devices_data=devices_data, strFPGAFirmware=strFPGAFirmware, strCPUFirmware=strCPUFirmware)
     # Run the event loop for this window
     app.exec_()
     print(initial_config.bOk)
@@ -434,9 +442,9 @@ def main():
 
 #    question = initialConfiguration()
 
-
     # Enter main event loop
 #    app.exec_()
+
 
 if __name__ == '__main__':
     main()

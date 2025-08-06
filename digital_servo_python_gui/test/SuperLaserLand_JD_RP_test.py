@@ -1,7 +1,7 @@
 
 import pytest
 
-from SuperLaserLand_mock import SuperLaserLand_mock
+from test.SuperLaserLand_mock import SuperLaserLand_mock
 
 
 

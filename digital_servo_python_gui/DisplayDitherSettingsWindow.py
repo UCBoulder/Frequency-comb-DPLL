@@ -18,24 +18,24 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
     def __init__(self, sl, sp, output_number, modulation_frequency_in_hz=1e3, output_amplitude=1e-4, integration_time_in_seconds=0.1, bEnableDither=0, custom_style_sheet=''):
         super(DisplayDitherSettingsWindow, self).__init__()
 
-
-
         self.output_number = output_number
-        self.sl:SuperLaserLand_JD_RP = weakref.proxy(sl)
+        self.sl: SuperLaserLand_JD_RP = weakref.proxy(sl)
         self.sp = sp
         self.setObjectName('MainWindow')
         self.setStyleSheet(custom_style_sheet)
 
-
-        self.initUI(modulation_frequency_in_hz, output_amplitude, integration_time_in_seconds, bEnableDither)
-
+        self.initUI(modulation_frequency_in_hz, output_amplitude,
+                    integration_time_in_seconds, bEnableDither)
 
     def loadParameters(self):
         strDAC = 'DAC{:01d}'.format(self.output_number)
 
-        dither_frequency = float((self.sp.getValue('Dither_frequency', strDAC)))
-        dither_integration_time = float((self.sp.getValue('Dither_integration_time', strDAC)))
-        dither_amplitude = float((self.sp.getValue('Dither_amplitude', strDAC)))
+        dither_frequency = float(
+            (self.sp.getValue('Dither_frequency', strDAC)))
+        dither_integration_time = float(
+            (self.sp.getValue('Dither_integration_time', strDAC)))
+        dither_amplitude = float(
+            (self.sp.getValue('Dither_amplitude', strDAC)))
         dither_mode = float((self.sp.getValue('Dither_mode', strDAC)))
 
         self.qedit_dither_freq.blockSignals(True)
@@ -43,13 +43,13 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
         self.qedit_dither_freq.blockSignals(False)
 
         self.qedit_integration_time.blockSignals(True)
-        self.qedit_integration_time.setText('{:.3f}'.format(dither_integration_time))
+        self.qedit_integration_time.setText(
+            '{:.3f}'.format(dither_integration_time))
         self.qedit_integration_time.blockSignals(False)
 
         self.qedit_dither_amplitude.blockSignals(True)
         self.qedit_dither_amplitude.setText('{:.2e}'.format(dither_amplitude))
         self.qedit_dither_amplitude.blockSignals(False)
-
 
         if dither_mode == 0:
             self.qchk_mode_manual_off.setChecked(True)
@@ -58,25 +58,29 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
         else:
             self.qchk_mode_auto.setChecked(True)
 
-
     def pushDefaultValues(self):
         self.loadParameters()
         self.pushValues()
 
-
     # This will make the window update the FPGA register
+
     def pushValues(self):
         self.ditherClicked()
 
     def getValues(self):
-        (modulation_period, N_periods, output_amplitude, bEnableDither, mode_auto) = self.sl.get_Dither_Settings(self.output_number)
+        (modulation_period, N_periods, output_amplitude, bEnableDither,
+         mode_auto) = self.sl.get_Dither_Settings(self.output_number)
 
-        modulation_frequency_in_hz = round(self.sl.dev.ADC_CLK_Hz/modulation_period)
+        modulation_frequency_in_hz = round(
+            self.sl.dev.ADC_CLK_Hz/modulation_period)
         self.qedit_dither_freq.blockSignals(True)
-        self.qedit_dither_freq.setText('{:.1e}'.format(modulation_frequency_in_hz))
+        self.qedit_dither_freq.setText(
+            '{:.1e}'.format(modulation_frequency_in_hz))
         self.qedit_dither_freq.blockSignals(False)
 
-        amplitude = output_amplitude*2/(self.sl.DACs_limit_high[self.output_number]-self.sl.DACs_limit_low[self.output_number])
+        amplitude = output_amplitude*2 / \
+            (self.sl.DACs_limit_high[self.output_number] -
+             self.sl.DACs_limit_low[self.output_number])
 
         self.qedit_dither_amplitude.blockSignals(True)
         self.qedit_dither_amplitude.setText('{:.2e}'.format(amplitude))
@@ -86,40 +90,46 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
         integration_time_in_seconds = integration_time_in_samples/self.sl.dev.ADC_CLK_Hz
 
         self.qedit_integration_time.blockSignals(True)
-        self.qedit_integration_time.setText('{:.3f}'.format(integration_time_in_seconds))
+        self.qedit_integration_time.setText(
+            '{:.3f}'.format(integration_time_in_seconds))
         self.qedit_integration_time.blockSignals(False)
 
         if mode_auto == 1:
             self.qchk_mode_auto.setChecked(True)
         else:
-            if bEnableDither ==1 :
+            if bEnableDither == 1:
                 self.qchk_mode_manual_on.setChecked(True)
             elif bEnableDither == 0:
                 self.qchk_mode_manual_off.setChecked(True)
 
-
     def retrieveValues(self):
         outdict = {}
-        (modulation_period, N_periods, output_amplitude, bEnableDither, mode_auto) = self.sl.get_Dither_Settings(self.output_number)
-        
-        modulation_frequency_in_hz = round(self.sl.dev.ADC_CLK_Hz/modulation_period)
+        (modulation_period, N_periods, output_amplitude, bEnableDither,
+         mode_auto) = self.sl.get_Dither_Settings(self.output_number)
 
-        amplitude = output_amplitude*2/(self.sl.DACs_limit_high[self.output_number]-self.sl.DACs_limit_low[self.output_number])
+        modulation_frequency_in_hz = round(
+            self.sl.dev.ADC_CLK_Hz/modulation_period)
+
+        amplitude = output_amplitude*2 / \
+            (self.sl.DACs_limit_high[self.output_number] -
+             self.sl.DACs_limit_low[self.output_number])
 
         integration_time_in_samples = N_periods*modulation_period
         integration_time_in_seconds = integration_time_in_samples/self.sl.dev.ADC_CLK_Hz
-        
+
         if self.qchk_mode_auto.isChecked():
             mode = 0
         elif self.qchk_mode_manual_off.isChecked():
             mode = 1
-        else: mode = 2
-        
-        outdict['modulation_freq'] = round(modulation_frequency_in_hz,4)
-        outdict['amplitude'] = round(amplitude,4)
-        outdict['integration_time_in_seconds'] = round(integration_time_in_seconds,4)
+        else:
+            mode = 2
+
+        outdict['modulation_freq'] = round(modulation_frequency_in_hz, 4)
+        outdict['amplitude'] = round(amplitude, 4)
+        outdict['integration_time_in_seconds'] = round(
+            integration_time_in_seconds, 4)
         outdict['mode'] = mode
-        
+
         return outdict
 
     def readDitherSettings(self):
@@ -135,9 +145,9 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
             modulation_frequency_in_hz = 1e3
             pass
 
-
         try:
-            output_amplitude = int((self.sl.DACs_limit_high[self.output_number]-self.sl.DACs_limit_low[self.output_number])/2.*float(self.qedit_dither_amplitude.text()))
+            output_amplitude = int(
+                (self.sl.DACs_limit_high[self.output_number]-self.sl.DACs_limit_low[self.output_number])/2.*float(self.qedit_dither_amplitude.text()))
         except:
             output_amplitude = 0
             pass
@@ -145,13 +155,13 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
             output_amplitude = 1
 
         try:
-            integration_time_in_seconds = float(self.qedit_integration_time.text())
+            integration_time_in_seconds = float(
+                self.qedit_integration_time.text())
         except:
             integration_time_in_seconds = 0.1
             pass
 
 #        try:
-
 
         if self.qchk_mode_auto.isChecked():
             mode_auto = 1
@@ -169,20 +179,21 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
 
         return (integration_time_in_seconds, modulation_frequency_in_hz, output_amplitude, bEnableDither, mode_auto)
 
-
-
     def ditherClicked(self):
-        (integration_time_in_seconds, modulation_frequency_in_hz, output_amplitude, bEnableDither, mode_auto) = self.readDitherSettings()
+        (integration_time_in_seconds, modulation_frequency_in_hz,
+         output_amplitude, bEnableDither, mode_auto) = self.readDitherSettings()
 
 #        print('(output_select, modulation_frequency_in_hz, output_amplitude, bSquareWave, bEnableDither) = %d, %f, %f, %d, %d' % (output_select, modulation_frequency_in_hz, output_amplitude, bSquareWave, bEnableDither))
-        modulation_period = round(self.sl.dev.ADC_CLK_Hz/modulation_frequency_in_hz)
+        modulation_period = round(
+            self.sl.dev.ADC_CLK_Hz/modulation_frequency_in_hz)
         integration_time_in_samples = integration_time_in_seconds*self.sl.dev.ADC_CLK_Hz
         N_periods = np.ceil(integration_time_in_samples/modulation_period)
-        self.sl.setupDitherLockIn(self.output_number, modulation_period, N_periods, output_amplitude, mode_auto)
+        self.sl.setupDitherLockIn(
+            self.output_number, modulation_period, N_periods, output_amplitude, mode_auto)
 
         if mode_auto == 0:
             # Manual mode:
-            #print('bEnableDither = %d' % bEnableDither)
+            # print('bEnableDither = %d' % bEnableDither)
             self.sl.setDitherLockInState(self.output_number, bEnableDither)
 
         return
@@ -197,25 +208,28 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
         # Settings
         ######################################################################
 
-        self.qgroupbox_dither = QtWidgets.QGroupBox('Dither DAC%d settings' % self.output_number)
+        self.qgroupbox_dither = QtWidgets.QGroupBox(
+            'Dither DAC%d settings' % self.output_number)
         self.qgroupbox_dither.setAutoFillBackground(True)
-
 
         # Modulation frequency:
         self.qedit_freq_label = QtWidgets.QLabel('Frequency [Hz]:')
-        self.qedit_dither_freq = QtWidgets.QLineEdit(str(modulation_frequency_in_hz))
+        self.qedit_dither_freq = QtWidgets.QLineEdit(
+            str(modulation_frequency_in_hz))
         self.qedit_dither_freq.textChanged.connect(self.ditherClicked)
         self.qedit_dither_freq.setMaximumWidth(60)
 
         # Integration time:
         self.qedit_int_label = QtWidgets.QLabel('Integration time [s]:')
-        self.qedit_integration_time = QtWidgets.QLineEdit(str(integration_time_in_seconds))
+        self.qedit_integration_time = QtWidgets.QLineEdit(
+            str(integration_time_in_seconds))
         self.qedit_integration_time.textChanged.connect(self.ditherClicked)
         self.qedit_integration_time.setMaximumWidth(60)
 
         # Amplitude:
         self.qlabel_dither_amplitude = QtWidgets.QLabel('Amplitude [0-1]:')
-        self.qedit_dither_amplitude = QtWidgets.QLineEdit(str(output_amplitude))
+        self.qedit_dither_amplitude = QtWidgets.QLineEdit(
+            str(output_amplitude))
         self.qedit_dither_amplitude.textChanged.connect(self.ditherClicked)
         self.qedit_dither_amplitude.setMaximumWidth(60)
 
@@ -259,14 +273,11 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
         vbox.addWidget(self.qgroupbox_dither)
         self.setLayout(vbox)
 
-
         # Adjust the size and position of the window
 #        self.resize(800, 600)
         self.center()
         self.setWindowTitle('Dither #%d control' % self.output_number)
-        #self.show()
-
-
+        # self.show()
 
     def center(self):
 
@@ -275,7 +286,3 @@ class DisplayDitherSettingsWindow(QtWidgets.QWidget):
         qr.moveCenter(cp)
 #        self.move(qr.topLeft())
 #        self.move(QtWidgets.QDesktopWidget().availableGeometry().topLeft() + Qt.QPoint(50, 50))
-
-
-
-

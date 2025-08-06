@@ -6,19 +6,17 @@ Description: Provides a graphical user interface (GUI) for setting the loop filt
 @author: JD Deschenes
 """
 from __future__ import print_function
-from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
-#import PyQt5.Qwt5 as Qwt
 import numpy as np
 import weakref
+
 from SuperLaserLand_JD_RP import SuperLaserLand_JD_RP
-
-import traceback
-
 from user_friendly_QLineEdit import user_friendly_QLineEdit
 
 # stuff for Python 3 port
 import pyqtgraph as pg
+
 
 class LoopFiltersUI(QtWidgets.QWidget):
 
@@ -49,7 +47,6 @@ class LoopFiltersUI(QtWidgets.QWidget):
         #     self.pll = pll
         #     self.getLimits()
 
-
         self.getLimits()
 
         # Init our GUI
@@ -62,7 +59,6 @@ class LoopFiltersUI(QtWidgets.QWidget):
 #    def __del__(self):
 #        print('LoopFiltersUI destructor called')
 
-
     def pushValues(self):
         pass
 
@@ -70,7 +66,7 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.getFilterSettings()
 
     def initUI(self):
-#        print('initUI()')
+        #        print('initUI()')
 
         # First create the plot:
         self.qplot_tf = pg.PlotWidget()
@@ -78,58 +74,58 @@ class LoopFiltersUI(QtWidgets.QWidget):
 #        self.qplot_tf.enableAxis(Qwt.QwtPlot.yLeft, False)
         self.qplot_tf.setMinimumHeight(100)
         self.qplot_tf.setMinimumWidth(100)
-        #self.qplot_tf.setCanvasBackground(Qt.Qt.white)
-        #self.qplot_tf.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLog10ScaleEngine())
+        # self.qplot_tf.setCanvasBackground(Qt.Qt.white)
+        # self.qplot_tf.setAxisScaleEngine(Qwt.QwtPlot.xBottom, Qwt.QwtLog10ScaleEngine())
         self.qplot_tf.getPlotItem().setLogMode(x=True)
 
+        # self.qplot_tf.setTitle('Loop filter #%d' % self.filter_number)
 
-        #self.qplot_tf.setTitle('Loop filter #%d' % self.filter_number)
-
-        #qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Expanding, Qt.QSizePolicy.Expanding)
-        #qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Expanding, Qt.QSizePolicy.Expanding)
-        qPolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
+        # qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Expanding, Qt.QSizePolicy.Expanding)
+        # qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.Expanding, Qt.QSizePolicy.Expanding)
+        qPolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
         self.qplot_tf.setSizePolicy(qPolicy)
 
         self.curve_0dB = self.qplot_tf.getPlotItem().plot()
-        #FEATURE
-        #self.curve_0dB.attach(self.qplot_tf)
-        #pen = Qt.QPen(Qt.Qt.DashLine)
-        #pen.setColor(Qt.Qt.black)
-        #pen.setBrush(QtWidgets.QBrush(QtCore.Qt.NoBrush))
+        # FEATURE
+        # self.curve_0dB.attach(self.qplot_tf)
+        # pen = Qt.QPen(Qt.Qt.DashLine)
+        # pen.setColor(Qt.Qt.black)
+        # pen.setBrush(QtWidgets.QBrush(QtCore.Qt.NoBrush))
         pen = pg.mkPen(color='k', dash=[4, 2])
         self.curve_0dB.setPen(pen)
 
         self.curve_kp = self.qplot_tf.getPlotItem().plot(pen='k')
-        #self.curve_kp.attach(self.qplot_tf)
-        #self.curve_kp.setPen(Qt.QPen(Qt.Qt.black))
+        # self.curve_kp.attach(self.qplot_tf)
+        # self.curve_kp.setPen(Qt.QPen(Qt.Qt.black))
 
         self.curve_fi = self.qplot_tf.getPlotItem().plot(pen='k')
-        #self.curve_fi.attach(self.qplot_tf)
-        #self.curve_fi.setPen(Qt.QPen(Qt.Qt.black))
+        # self.curve_fi.attach(self.qplot_tf)
+        # self.curve_fi.setPen(Qt.QPen(Qt.Qt.black))
 
         self.curve_fii = self.qplot_tf.getPlotItem().plot(pen='k')
-        #self.curve_fii.attach(self.qplot_tf)
-        #self.curve_fii.setPen(Qt.QPen(Qt.Qt.black))
+        # self.curve_fii.attach(self.qplot_tf)
+        # self.curve_fii.setPen(Qt.QPen(Qt.Qt.black))
 
         self.curve_fd = self.qplot_tf.getPlotItem().plot(pen='k')
         # self.curve_fd = self.qplot_tf.getPlotItem().plot()
-        #self.curve_fd.attach(self.qplot_tf)
+        # self.curve_fd.attach(self.qplot_tf)
         # self.curve_fd.setPen(Qt.QPen(Qt.Qt.black))
 
         self.curve_fdf = self.qplot_tf.getPlotItem().plot(pen='k')
-        #self.curve_fdf.attach(self.qplot_tf)
+        # self.curve_fdf.attach(self.qplot_tf)
         # pen2 = Qt.QPen(Qt.Qt.DashLine)
         # pen2.setColor(Qt.Qt.black)
-        #self.curve_fdf.setPen(pen2)
+        # self.curve_fdf.setPen(pen2)
 
         self.curve_composite = self.qplot_tf.getPlotItem().plot()
-        #self.curve_composite.attach(self.qplot_tf)
+        # self.curve_composite.attach(self.qplot_tf)
         self.curve_composite.setPen(pg.mkPen('r'))
 
         # self.curve_actual = self.qplot_tf.getPlotItem().plot(fillLevel=-140, fillBrush='b')
         self.curve_actual = self.qplot_tf.getPlotItem().plot()
-        #self.curve_actual.attach(self.qplot_tf)
-        #self.curve_actual.setPen(Qt.QPen(Qt.Qt.blue, 2))
+        # self.curve_actual.attach(self.qplot_tf)
+        # self.curve_actual.setPen(Qt.QPen(Qt.Qt.blue, 2))
         self.curve_actual.setPen(pg.mkPen('b', width=2))
 
 #        self.curve_0dB.setPen(self.qplot_tf)
@@ -141,11 +137,9 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.qlabel_spacerv = QtWidgets.QLabel('')
         self.qlabel_spacerv.setMinimumHeight(25)
 
-
         self.qchk_lock = QtWidgets.QCheckBox('Lock On')
         self.qchk_lock.clicked.connect(self.textboxChanged)
         self.qchk_lock.setEnabled(self.bDisplayLockChkBox)
-
 
         self.qchk_kp = QtWidgets.QCheckBox('Kp On')
         self.qchk_kp.clicked.connect(self.textboxChanged)
@@ -175,7 +169,6 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.qedit_fd.returnPressed.connect(self.textboxChanged)
         self.qedit_fdf.returnPressed.connect(self.textboxChanged)
 
-
         self.qchk_bKpCrossing = QtWidgets.QCheckBox('fi refer to kp crossover')
         self.qchk_bKpCrossing.setChecked(False)
         self.qchk_bKpCrossing.clicked.connect(self.textboxChanged)
@@ -200,7 +193,8 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.qslider_fdf.setOrientation(Qt.Horizontal)
 
         # Set bounds:
-        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min, gain_max, bLock) = self.getSettings()
+        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min,
+         gain_max, bLock) = self.getSettings()
         # The fi and fii sliders will contain the value in 100*log10(f) units (similar to dBHz, but with a different scaling - this is because we can only use integer units)
         self.qslider_fi.setMinimum(int(100*np.log10(fmin)))
         self.qslider_fii.setMinimum(int(100*np.log10(fmin)))
@@ -225,7 +219,6 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.qslider_fd.valueChanged.connect(self.fdSliderEvent)
         self.qslider_fdf.valueChanged.connect(self.fdfSliderEvent)
 
-
         # Every control for the proportional gain goes into an hbox:
 
         vbox = QtWidgets.QVBoxLayout()
@@ -233,11 +226,8 @@ class LoopFiltersUI(QtWidgets.QWidget):
         vbox.addWidget(self.qchk_kp)
         vbox.addWidget(self.qchk_kd)
 
-
-
         # Put everything in a grid layout:
         grid = QtWidgets.QGridLayout()
-
 
         grid.addLayout(vbox,                    0, 0, 2, 2)
         grid.addWidget(self.qslider_kp,         0, 2, 3, 1)
@@ -245,8 +235,6 @@ class LoopFiltersUI(QtWidgets.QWidget):
         grid.addWidget(self.qplot_tf,           0, 3, 9, 1)
         grid.setColumnStretch(3, 1)
         grid.setRowStretch(8, 1)
-
-
 
         grid.addWidget(self.qlabel_kp,          2, 0)
         grid.addWidget(self.qlabel_fi,          3, 0)
@@ -260,19 +248,13 @@ class LoopFiltersUI(QtWidgets.QWidget):
         grid.addWidget(self.qedit_fd,           5, 1, 1, 1)
         grid.addWidget(self.qedit_fdf,          6, 1, 1, 1)
 
-
-
-
-
         grid.addWidget(self.qchk_bKpCrossing,   7, 0, 1, 3)
-
-
 
         grid.addWidget(self.qslider_fi,         3, 2, 1, 1)
         grid.addWidget(self.qslider_fii,        4, 2, 1, 1)
         grid.addWidget(self.qslider_fd,         5, 2, 1, 1)
         grid.addWidget(self.qslider_fdf,        6, 2, 1, 1)
-        #grid.addWidget(self.qlabel_spacerh2,    4, 5, 1, 1)
+        # grid.addWidget(self.qlabel_spacerh2,    4, 5, 1, 1)
 
         self.setLayout(grid)
 
@@ -282,14 +264,13 @@ class LoopFiltersUI(QtWidgets.QWidget):
         # hbox.setColumnStretch(1, 1)
         # self.setLayout(hbox)
 
-
-        #qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.MinimumExpanding, Qt.QSizePolicy.MinimumExpanding)
-        #self.setSizePolicy(qPolicy)
+        # qPolicy = Qt.QSizePolicy(Qt.QSizePolicy.MinimumExpanding, Qt.QSizePolicy.MinimumExpanding)
+        # self.setSizePolicy(qPolicy)
 
     def loadParameters(self, sp):
-#        print('loadParameters(): Entering')
+        #        print('loadParameters(): Entering')
 
-#        self.root.append(Element('PLL0_settings', kp='-60', fi='1e3', fii='0', chkKp='True', chkLock='False', chkKpCrossing='True'))
+        #        self.root.append(Element('PLL0_settings', kp='-60', fi='1e3', fii='0', chkKp='True', chkLock='False', chkKpCrossing='True'))
         strPLL = 'PLL{:01d}_settings'.format(self.filter_number)
         kp = float(sp.getValue(strPLL, 'kp'))
         fi = float(sp.getValue(strPLL, 'fi'))
@@ -299,7 +280,8 @@ class LoopFiltersUI(QtWidgets.QWidget):
         bKp = bool(sp.getValue(strPLL, 'chkKp').lower() == 'true')
         bKd = bool(sp.getValue(strPLL, 'chkKd').lower() == 'true')
         bLock = bool(sp.getValue(strPLL, 'chkLock').lower() == 'true')
-        kKpCrossing = bool(sp.getValue(strPLL, 'chkKpCrossing').lower() == 'true')
+        kKpCrossing = bool(sp.getValue(
+            strPLL, 'chkKpCrossing').lower() == 'true')
 #        print('loadParameters(): kp = %f, fi = %f, fii = %f' % (kp, fi, fii))
 
         # Update the values in the UI to reflect the internal values:
@@ -389,7 +371,7 @@ class LoopFiltersUI(QtWidgets.QWidget):
         return (kp, fi, fii, fd, fdf, fmin, fmax, gain_min, gain_max, bLock)
 
     def kpSliderEvent(self):
-#        print('kpSliderEvent()')
+        #        print('kpSliderEvent()')
         # Read the setting from the slider, apply limits, then update the textbox and the graph:
         sliderValue = self.qslider_kp.value()
 
@@ -402,11 +384,10 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.updateGraph()
 
     def fiSliderEvent(self):
-#        print('fiSliderEvent()')
+        #        print('fiSliderEvent()')
         # Read the setting from the slider, apply limits, then update the textbox and the graph:
         # The fi and fii sliders will contain the value in 100*log10(f) units
         sliderValue = self.qslider_fi.value()
-
 
         self.qedit_fi.blockSignals(True)
         self.qedit_fi.setText('%.2e' % 10**(sliderValue/100.))
@@ -417,10 +398,9 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.updateGraph()
 
     def fiiSliderEvent(self):
-#        print('fiiSliderEvent()')
+        #        print('fiiSliderEvent()')
         # Read the setting from the slider, apply limits, then update the textbox and the graph:
         sliderValue = self.qslider_fii.value()
-
 
         self.qedit_fii.blockSignals(True)
         self.qedit_fii.setText('%.2e' % 10**(sliderValue/100.))
@@ -431,7 +411,7 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.updateGraph()
 
     def fdSliderEvent(self):
-#        print('fiiSliderEvent()')
+        #        print('fiiSliderEvent()')
         # Read the setting from the slider, apply limits, then update the textbox and the graph:
         sliderValue = self.qslider_fd.value()
 
@@ -446,14 +426,14 @@ class LoopFiltersUI(QtWidgets.QWidget):
 
         if self.slider_locked == True and self.slider_inhibit == False:
             self.slider_inhibit = True
-            self.qslider_fdf.setValue(int(float(sliderValue)+100*np.log10(self.slider_ratio)))
+            self.qslider_fdf.setValue(
+                int(float(sliderValue)+100*np.log10(self.slider_ratio)))
         self.slider_inhibit = False
 
     def fdfSliderEvent(self):
-#        print('fiiSliderEvent()')
+        #        print('fiiSliderEvent()')
         # Read the setting from the slider, apply limits, then update the textbox and the graph:
         sliderValue = self.qslider_fdf.value()
-
 
         self.qedit_fdf.blockSignals(True)
         self.qedit_fdf.setText('%.2e' % 10**(sliderValue/100.))
@@ -466,15 +446,17 @@ class LoopFiltersUI(QtWidgets.QWidget):
 
         if self.slider_locked == True and self.slider_inhibit == False:
             self.slider_inhibit = True
-            self.qslider_fd.setValue(int(float(sliderValue)-100*np.log10(self.slider_ratio)))
+            self.qslider_fd.setValue(
+                int(float(sliderValue)-100*np.log10(self.slider_ratio)))
         self.slider_inhibit = False
 
     def textboxChanged(self):
-#        print('textboxChanged()')
-#        traceback.print_stack()
+        #        print('textboxChanged()')
+        #        traceback.print_stack()
 
         # Read the settings from the textboxes
-        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min, gain_max, bLock) = self.getSettings()
+        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min,
+         gain_max, bLock) = self.getSettings()
         # Update the sliders to match:
         # We block the signals from the sliders so we don't cause infinite recursion
 #        self.qslider_fi.setValue((100*np.log10(fi)))
@@ -500,11 +482,12 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.updateGraph()
 
     def textboxChanged_withoutUpdateFPGA(self):
-#        print('textboxChanged()')
-#        traceback.print_stack()
+        #        print('textboxChanged()')
+        #        traceback.print_stack()
 
         # Read the settings from the textboxes
-        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min, gain_max, bLock) = self.getSettings()
+        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min,
+         gain_max, bLock) = self.getSettings()
         # Update the sliders to match:
         # We block the signals from the sliders so we don't cause infinite recursion
 #        self.qslider_fi.setValue((100*np.log10(fi)))
@@ -529,8 +512,9 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.updateGraph()
 
     def checkFirmwareLimits(self):
-#        traceback.print_stack()
-        (P_gain, I_gain, II_gain, D_gain, D_coef, bLock) = self.getActualControllerDesign()
+        #        traceback.print_stack()
+        (P_gain, I_gain, II_gain, D_gain, D_coef,
+         bLock) = self.getActualControllerDesign()
 
         # Read the firmware gain limits to check if the values are within range:
         self.getLimits()
@@ -617,7 +601,8 @@ class LoopFiltersUI(QtWidgets.QWidget):
 
         # Get the firmware gain limits and show them in the tooltips
         self.getLimits()
-        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min, gain_max, bLock) = self.getSettings()
+        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min,
+         gain_max, bLock) = self.getSettings()
 
         # to prevent divides by zero:
         if fi == 0.0:
@@ -635,36 +620,52 @@ class LoopFiltersUI(QtWidgets.QWidget):
                 kp_max_dB = 20*np.log10(self.kp_max * self.kc)
             fi_min = self.ki_min * self.kc / (2*np.pi/self.sl.dev.ADC_CLK_Hz)
             fi_max = self.ki_max * self.kc / (2*np.pi/self.sl.dev.ADC_CLK_Hz)
-            fii_min = self.kii_min *self.kc / fi / (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
-            fii_max = self.kii_max *self.kc / fi / (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
-            fd_min = self.kd_min * self.kc * fd * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
-            fd_max = self.kd_max * self.kc * fd * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
+            fii_min = self.kii_min * self.kc / fi / \
+                (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
+            fii_max = self.kii_max * self.kc / fi / \
+                (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
+            fd_min = self.kd_min * self.kc * fd * \
+                (2*np.pi/self.sl.dev.ADC_CLK_Hz)
+            fd_max = self.kd_max * self.kc * fd * \
+                (2*np.pi/self.sl.dev.ADC_CLK_Hz)
         else:
             if self.kp_min * self.kc <= 0:
-                kp_min_dB = - np.inf 
+                kp_min_dB = - np.inf
             else:
-                kp_min_dB = 20*np.log10(self.kp_min * self.kc)            
+                kp_min_dB = 20*np.log10(self.kp_min * self.kc)
             if self.kp_max * self.kc <= 0:
                 kp_max_dB = - np.inf
             else:
                 kp_max_dB = 20*np.log10(self.kp_max * self.kc)
-            fi_min = self.ki_min * self.kc/10**(kp/20) / (2*np.pi/self.sl.dev.ADC_CLK_Hz)
-            fi_max = self.ki_max * self.kc/10**(kp/20) / (2*np.pi/self.sl.dev.ADC_CLK_Hz)
-            fii_min = self.kii_min *self.kc/10**(kp/20) / fi / (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
-            fii_max = self.kii_max *self.kc/10**(kp/20) / fi / (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
-            fd_min = self.kd_min * self.kc/10**(kp/20) * fd * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
-            fd_max = self.kd_max * self.kc/10**(kp/20) * fd * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
+            fi_min = self.ki_min * self.kc / \
+                10**(kp/20) / (2*np.pi/self.sl.dev.ADC_CLK_Hz)
+            fi_max = self.ki_max * self.kc / \
+                10**(kp/20) / (2*np.pi/self.sl.dev.ADC_CLK_Hz)
+            fii_min = self.kii_min * self.kc / \
+                10**(kp/20) / fi / (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
+            fii_max = self.kii_max * self.kc / \
+                10**(kp/20) / fi / (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
+            fd_min = self.kd_min * self.kc / \
+                10**(kp/20) * fd * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
+            fd_max = self.kd_max * self.kc / \
+                10**(kp/20) * fd * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
         fdf_min = (self.sl.dev.ADC_CLK_Hz*self.kdf_min)/(2*np.pi)
         fdf_max = (self.sl.dev.ADC_CLK_Hz*self.kdf_max)/(2*np.pi)
 
-        self.qedit_kp.setToolTip('Proportional gain in dB: [{:.2f}, {:.2f}]'.format(kp_min_dB, kp_max_dB))
-        self.qedit_fi.setToolTip('Integrator cross-over frequency in Hz: [{:.2e}, {:.2e}]'.format(fi_min, fi_max))
-        self.qedit_fii.setToolTip('Double integrator cross-over frequency in Hz: [{:.2e}, {:.2e}]'.format(fii_min, fii_max))
-        self.qedit_fd.setToolTip('Differentiator cross-over frequency in Hz: [{:.2e}, {:.2e}]'.format(fd_min, fd_max))
-        self.qedit_fdf.setToolTip('Differentiator filter roll-off frequency in Hz: [{:.2e}, {:.2e}]'.format(fdf_min, fdf_max))
+        self.qedit_kp.setToolTip(
+            'Proportional gain in dB: [{:.2f}, {:.2f}]'.format(kp_min_dB, kp_max_dB))
+        self.qedit_fi.setToolTip(
+            'Integrator cross-over frequency in Hz: [{:.2e}, {:.2e}]'.format(fi_min, fi_max))
+        self.qedit_fii.setToolTip(
+            'Double integrator cross-over frequency in Hz: [{:.2e}, {:.2e}]'.format(fii_min, fii_max))
+        self.qedit_fd.setToolTip(
+            'Differentiator cross-over frequency in Hz: [{:.2e}, {:.2e}]'.format(fd_min, fd_max))
+        self.qedit_fdf.setToolTip(
+            'Differentiator filter roll-off frequency in Hz: [{:.2e}, {:.2e}]'.format(fdf_min, fdf_max))
 
     def getActualControllerDesign(self):
-        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min, gain_max, bLock) = self.getSettings()
+        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min,
+         gain_max, bLock) = self.getSettings()
 
         if self.qchk_bKpCrossing.isChecked() == False:
             # I is relative to 1/kc
@@ -672,7 +673,8 @@ class LoopFiltersUI(QtWidgets.QWidget):
             P_gain = 10**(kp/20)/self.kc
 
             I_gain = 1/self.kc * fi * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
-            II_gain = 1/self.kc * fi * fii * (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
+            II_gain = 1/self.kc * fi * fii * \
+                (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
             if fd == 0.0:
                 D_gain = 0.0
             else:
@@ -681,37 +683,41 @@ class LoopFiltersUI(QtWidgets.QWidget):
             # I is relative to kp/kc
             # all the values here are relative to the open-loop DC gain of the system, self.kc:
             P_gain = 10**(kp/20)/self.kc
-            I_gain = 10**(kp/20)/self.kc * fi * (2*np.pi/self.sl.dev.ADC_CLK_Hz)
-            II_gain = 10**(kp/20)/self.kc * fi * fii * (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
+            I_gain = 10**(kp/20)/self.kc * fi * \
+                (2*np.pi/self.sl.dev.ADC_CLK_Hz)
+            II_gain = 10**(kp/20)/self.kc * fi * fii * \
+                (2*np.pi/self.sl.dev.ADC_CLK_Hz)**2
             if fd == 0.0:
                 D_gain = 0.0
             else:
-                D_gain = 10**(kp/20)/self.kc * self.sl.dev.ADC_CLK_Hz / (2*np.pi*fd)
+                D_gain = 10**(kp/20)/self.kc * \
+                    self.sl.dev.ADC_CLK_Hz / (2*np.pi*fd)
 
         D_coef = (2*np.pi*fdf) / self.sl.dev.ADC_CLK_Hz
-
 
         if self.qchk_kp.isChecked() == False:
             P_gain = 0
         if self.qchk_kd.isChecked() == False:
             D_gain = 0
 
-
         return (P_gain, I_gain, II_gain, D_gain, D_coef, bLock)
 
     def updateFilterSettings(self):
-#        print('LoopFiltersUI::updateFilterSettings(): Entering')
-#        traceback.print_stack()
+        #        print('LoopFiltersUI::updateFilterSettings(): Entering')
+        #        traceback.print_stack()
 
-        (P_gain, I_gain, II_gain, D_gain, D_coef, bLock) = self.getActualControllerDesign()
+        (P_gain, I_gain, II_gain, D_gain, D_coef,
+         bLock) = self.getActualControllerDesign()
 
-        self.sl.pll[self.filter_number].set_pll_settings(P_gain, I_gain, II_gain, D_gain, D_coef, bLock, self.kc)
+        self.sl.pll[self.filter_number].set_pll_settings(
+            P_gain, I_gain, II_gain, D_gain, D_coef, bLock, self.kc)
 
 #        print('LoopFiltersUI::updateFilterSettings(): Exiting')
 
     def getFilterSettings(self):
 
-        (P_gain, I_gain, II_gain, D_gain, D_coef, bLock, OL_gain) = self.sl.pll[self.filter_number].get_pll_settings()
+        (P_gain, I_gain, II_gain, D_gain, D_coef, bLock,
+         OL_gain) = self.sl.pll[self.filter_number].get_pll_settings()
 
         # print("P_gain %f" % P_gain)
         # print("I_gain %f" % I_gain)
@@ -724,17 +730,17 @@ class LoopFiltersUI(QtWidgets.QWidget):
 
         if P_gain == 0:
             kp = -120
-            self.qchk_bKpCrossing.setChecked(False) #We don't want to define fi, fii and fd with kp if kp is off
+            # We don't want to define fi, fii and fd with kp if kp is off
+            self.qchk_bKpCrossing.setChecked(False)
 
         else:
             kp = np.log10(P_gain*self.kc)*20
 #            print("kp %f" % kp)
 
-
-
         if self.qchk_bKpCrossing.isChecked() == False:
 
-            fi = float(I_gain)*float(self.kc)*float(self.sl.dev.ADC_CLK_Hz)/(float(2)*float(np.pi))
+            fi = float(I_gain)*float(self.kc) * \
+                float(self.sl.dev.ADC_CLK_Hz)/(float(2)*float(np.pi))
 #            print("fi %f" % fi)
             try:
                 fii = II_gain*self.kc/fi/((2*np.pi/self.sl.dev.ADC_CLK_Hz)**2)
@@ -750,17 +756,19 @@ class LoopFiltersUI(QtWidgets.QWidget):
 
         else:
             fi = (I_gain*self.kc*self.sl.dev.ADC_CLK_Hz/(2*np.pi))/10**(kp/20)
-            #print("fi %f" % fi)
+            # print("fi %f" % fi)
             try:
-                fii = II_gain*self.kc/fi/10**(kp/20)/((2*np.pi/self.sl.dev.ADC_CLK_Hz)**2)
+                fii = II_gain*self.kc/fi / \
+                    10**(kp/20)/((2*np.pi/self.sl.dev.ADC_CLK_Hz)**2)
             except:
                 fii = 0
-            #print("fii %f" % fii)
+            # print("fii %f" % fii)
             if D_gain == 0:
                 fd = 0
             else:
-                fd = 1/(D_gain/(10**(kp/20))*self.kc/self.sl.dev.ADC_CLK_Hz*2*np.pi)
-            #print("fd %f" % fd)
+                fd = 1/(D_gain/(10**(kp/20))*self.kc /
+                        self.sl.dev.ADC_CLK_Hz*2*np.pi)
+            # print("fd %f" % fd)
 
         fdf = D_coef*self.sl.dev.ADC_CLK_Hz/(2*np.pi)
 
@@ -804,10 +812,10 @@ class LoopFiltersUI(QtWidgets.QWidget):
             self.qchk_kd.setChecked(True)
 
         if bLock == 1:
-            self.qchk_lock.setChecked(True) #Nothing on the gui, but XEM_GUI_MainWindow use this qchk to check at the look
+            # Nothing on the gui, but XEM_GUI_MainWindow use this qchk to check at the look
+            self.qchk_lock.setChecked(True)
         else:
             self.qchk_lock.setChecked(False)
-
 
         try:
             fmin = 10.0
@@ -837,15 +845,12 @@ class LoopFiltersUI(QtWidgets.QWidget):
         self.qslider_kp.setValue(int(np.max((10*kp, 10*gain_min))))
         self.qslider_kp.blockSignals(False)
 
-        self.textboxChanged_withoutUpdateFPGA() # To update the sliders
-
-
-
-
+        self.textboxChanged_withoutUpdateFPGA()  # To update the sliders
 
     def lockSlider(self):
         if self.qchk_lockSlider.isChecked() == True:
-            (kp, fi, fii, fd, fdf, fmin, fmax, gain_min, gain_max, bLock) = self.getSettings()
+            (kp, fi, fii, fd, fdf, fmin, fmax, gain_min,
+             gain_max, bLock) = self.getSettings()
             self.slider_locked = True
             self.slider_inhibit = False
             self.slider_ratio = float(fdf)/float(fd)
@@ -854,12 +859,13 @@ class LoopFiltersUI(QtWidgets.QWidget):
             self.slider_inhibit = False
 
     def updateGraph(self):
-#        print('LoopFiltersUI::updateGraph(): Entering')
-        #self.updateFilterSettings()
+        #        print('LoopFiltersUI::updateGraph(): Entering')
+        # self.updateFilterSettings()
         self.updateTooltips()
-        #self.checkFirmwareLimits()
+        # self.checkFirmwareLimits()
         # Read the settings from the textboxes
-        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min, gain_max, bLock) = self.getSettings()
+        (kp, fi, fii, fd, fdf, fmin, fmax, gain_min,
+         gain_max, bLock) = self.getSettings()
         # print("kp %f" % kp)
         # print("fi %f" % fi)
         # print("fii %f" % fii)
@@ -891,7 +897,8 @@ class LoopFiltersUI(QtWidgets.QWidget):
                 # fi relative to kp dB crossing
                 gain_array = 10**(kp/20) * fi/f_array
 #        print(20*np.log10(gain_array))
-        self.curve_fi.setData(f_array, 20*np.log10(gain_array + self.MINIMUM_GAIN_DISPLAY))
+        self.curve_fi.setData(
+            f_array, 20*np.log10(gain_array + self.MINIMUM_GAIN_DISPLAY))
         # Draw the II gain curve:
         if fii == 0.0:
             gain_array = 10**(gain_min/20 - 1) + 0*f_array
@@ -903,7 +910,8 @@ class LoopFiltersUI(QtWidgets.QWidget):
                 # fi relative to kp dB crossing
                 gain_array = 10**(kp/20) * fi/f_array * fii/f_array
 #        print(20*np.log10(gain_array))
-        self.curve_fii.setData(f_array, 20*np.log10(gain_array + self.MINIMUM_GAIN_DISPLAY))
+        self.curve_fii.setData(
+            f_array, 20*np.log10(gain_array + self.MINIMUM_GAIN_DISPLAY))
 
         # Draw the D gain curve:
         if fd == 0.0:
@@ -916,9 +924,10 @@ class LoopFiltersUI(QtWidgets.QWidget):
                 # fi relative to kp dB crossing
                 gain_array = 10**(kp/20) * f_array/fd
 #        print(20*np.log10(gain_array))
-        self.curve_fd.setData(f_array, 20*np.log10(gain_array + self.MINIMUM_GAIN_DISPLAY))
+        self.curve_fd.setData(
+            f_array, 20*np.log10(gain_array + self.MINIMUM_GAIN_DISPLAY))
 
-        #print("fd %f" % fd)
+        # print("fd %f" % fd)
         if (fdf == 0) or (fd == 0):
             gain_array = 0*f_array
         else:
@@ -930,34 +939,34 @@ class LoopFiltersUI(QtWidgets.QWidget):
                 # fi relative to kp dB crossing
                 gain_array = 10**(kp/20) * fdf/fd + 0*f_array
     #        print(20*np.log10(gain_array))
-        self.curve_fdf.setData(f_array, 20*np.log10(gain_array + self.MINIMUM_GAIN_DISPLAY))
-
+        self.curve_fdf.setData(
+            f_array, 20*np.log10(gain_array + self.MINIMUM_GAIN_DISPLAY))
 
         f_array = np.logspace(np.log10(fmin), np.log10(fmax), 1000)
-        actual_gain_array = np.abs(self.sl.pll[self.filter_number].get_current_transfer_function(f_array, self.sl.dev.ADC_CLK_Hz) * self.kc)
-        self.curve_actual.setData(f_array, 20*np.log10(actual_gain_array + self.MINIMUM_GAIN_DISPLAY))
+        actual_gain_array = np.abs(self.sl.pll[self.filter_number].get_current_transfer_function(
+            f_array, self.sl.dev.ADC_CLK_Hz) * self.kc)
+        self.curve_actual.setData(
+            f_array, 20*np.log10(actual_gain_array + self.MINIMUM_GAIN_DISPLAY))
 
         # print('LoopFiltersUI: setting X range: %f, %f' % (fmin, fmax))
         # print('LoopFiltersUI: setting Y range: %f, %f' % (gain_min, gain_max))
-        #self.qplot_tf.setXRange(np.log10(fmin), np.log10(fmax))
+        # self.qplot_tf.setXRange(np.log10(fmin), np.log10(fmax))
         self.qplot_tf.setYRange(gain_min, gain_max)
 
-
-
-        #self.qplot_tf.replot()
+        # self.qplot_tf.replot()
 
 #        print('LoopFiltersUI::updateGraph(): Exiting')
 
-#def main():
+# def main():
 #
 #    app = QtWidgets.QApplication(sys.argv)
 #    w = LoopFiltersUI()
 #    w.show()
 #    w.resize(800, 300)
 #
-##    sys.exit(app.exec_())
+# sys.exit(app.exec_())
 #    app.exec_()
 #
-#if __name__ == '__main__':
+# if __name__ == '__main__':
 #    main()
 #
